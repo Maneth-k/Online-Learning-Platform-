@@ -1,6 +1,12 @@
 import express, { type Application, type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import {
+  connectDB,
+  disconnectDB,
+  checkDatabaseHealth,
+  type DatabaseHealth,
+} from './config/db.js';
 
 dotenv.config();
 
@@ -32,14 +38,21 @@ interface HealthResponse {
   message: string;
   timestamp: string;
   env: string;
+  database: DatabaseHealth;
 }
 
-app.get('/api/health', (_req: Request, res: Response<HealthResponse>) => {
-  res.status(200).json({
-    status: 'ok',
-    message: 'LMS Backend Server is operational (TypeScript)',
+app.get('/api/health', async (_req: Request, res: Response<HealthResponse>) => {
+  const database = await checkDatabaseHealth();
+  const isHealthy = database.status === 'connected';
+
+  res.status(isHealthy ? 200 : 503).json({
+    status: isHealthy ? 'ok' : 'degraded',
+    message: isHealthy
+      ? 'LMS Backend Server and Database are operational'
+      : 'LMS Backend Server is running but database is not connected',
     timestamp: new Date().toISOString(),
     env: process.env.NODE_ENV || 'development',
+    database,
   });
 });
 
@@ -68,22 +81,34 @@ app.use((err: HttpError, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 // Server Initialization
-const server = app.listen(PORT, () => {
-  console.log(`🚀 LMS Server running on http://localhost:${PORT}`);
-  console.log(`🛡️  CORS allowed origin: ${CLIENT_URL}`);
-  console.log(`⚡ TypeScript environment initialized`);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+  } catch (err) {
+    console.error('Failed to establish initial MongoDB connection:', err);
+  }
 
-// Graceful Process Termination
-const handleShutdown = (signal: string) => {
-  console.log(`\nReceived ${signal}. Shutting down server gracefully...`);
-  server.close(() => {
-    console.log('Server process terminated cleanly.');
-    process.exit(0);
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 LMS Server running on http://localhost:${PORT}`);
+    console.log(`🛡️  CORS allowed origin: ${CLIENT_URL}`);
+    console.log(`⚡ TypeScript environment initialized`);
   });
+
+  // Graceful Process Termination
+  const handleShutdown = async (signal: string) => {
+    console.log(`\nReceived ${signal}. Shutting down server gracefully...`);
+    server.close(async () => {
+      console.log('HTTP server closed.');
+      await disconnectDB();
+      console.log('Server process terminated cleanly.');
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGINT', () => handleShutdown('SIGINT'));
+  process.on('SIGTERM', () => handleShutdown('SIGTERM'));
 };
 
-process.on('SIGINT', () => handleShutdown('SIGINT'));
-process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+startServer();
 
 export default app;
