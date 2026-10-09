@@ -1,5 +1,6 @@
 import express, { type Application, type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import {
   connectDB,
@@ -7,6 +8,8 @@ import {
   checkDatabaseHealth,
   type DatabaseHealth,
 } from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
+import courseRoutes from './routes/courseRoutes.js';
 
 dotenv.config();
 
@@ -21,6 +24,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -32,7 +36,12 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/courses', courseRoutes);
+
 // Health check endpoint
+
 interface HealthResponse {
   status: 'ok' | 'degraded';
   message: string;
