@@ -1,13 +1,51 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCurrentUser, useLogout } from './hooks/useAuth.js';
 import { LandingPage } from './components/landing/LandingPage.js';
+import { LoginScreen } from './components/auth/LoginScreen.js';
+import { RegisterScreen } from './components/auth/RegisterScreen.js';
 import { AddCourseForm } from './components/AddCourseForm.js';
+
+type ViewMode = 'landing' | 'login' | 'register' | 'dashboard';
 
 function App() {
   const { data: user, isLoading } = useCurrentUser();
   const logoutMutation = useLogout();
-  const [currentView, setCurrentView] = useState<'landing' | 'dashboard'>('landing');
+  const [currentView, setCurrentView] = useState<ViewMode>('landing');
   const [showAddCourse, setShowAddCourse] = useState(false);
+
+  // Sync hash routing so users can directly load #login or #register
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#login') {
+        setCurrentView('login');
+      } else if (hash === '#register' || hash === '#signup') {
+        setCurrentView('register');
+      } else if (hash === '#dashboard') {
+        setCurrentView('dashboard');
+      } else if (!hash || hash === '#' || hash === '#home') {
+        setCurrentView('landing');
+      }
+    };
+
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const navigateToView = (view: ViewMode) => {
+    setCurrentView(view);
+    if (view === 'login') {
+      window.location.hash = 'login';
+    } else if (view === 'register') {
+      window.location.hash = 'register';
+    } else if (view === 'dashboard') {
+      window.location.hash = 'dashboard';
+    } else {
+      window.location.hash = '';
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   if (isLoading) {
     return (
@@ -27,6 +65,27 @@ function App() {
     );
   }
 
+  // Login View
+  if (currentView === 'login') {
+    return (
+      <LoginScreen
+        onSwitchToRegister={() => navigateToView('register')}
+        onBackToHome={() => navigateToView('landing')}
+      />
+    );
+  }
+
+  // Register View
+  if (currentView === 'register') {
+    return (
+      <RegisterScreen
+        onSwitchToLogin={() => navigateToView('login')}
+        onBackToHome={() => navigateToView('landing')}
+      />
+    );
+  }
+
+  // Dashboard View (when user is authenticated and enters dashboard)
   if (currentView === 'dashboard' && user) {
     return (
       <div
@@ -60,7 +119,7 @@ function App() {
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
             <button
               type="button"
-              onClick={() => setCurrentView('landing')}
+              onClick={() => navigateToView('landing')}
               style={{
                 padding: '6px 14px',
                 borderRadius: '8px',
@@ -167,7 +226,8 @@ function App() {
     <LandingPage
       currentUser={user}
       onLogout={() => logoutMutation.mutate()}
-      onOpenDashboard={() => setCurrentView('dashboard')}
+      onOpenDashboard={() => navigateToView('dashboard')}
+      onNavigateToAuth={(mode) => navigateToView(mode === 'register' ? 'register' : 'login')}
     />
   );
 }

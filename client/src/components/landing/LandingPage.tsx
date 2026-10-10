@@ -6,21 +6,21 @@ import { FeaturedCourses } from './FeaturedCourses';
 import { HowItWorks } from './HowItWorks';
 import { AiDemoSection } from './AiDemoSection';
 import { Footer } from './Footer';
-import { LoginForm } from '../LoginForm';
 import './LandingPage.css';
 
 interface LandingPageProps {
   currentUser?: { username: string; role: string } | null;
   onLogout?: () => void;
   onOpenDashboard?: () => void;
+  onNavigateToAuth?: (mode: 'login' | 'register') => void;
 }
 
 export function LandingPage({
   currentUser,
   onLogout,
   onOpenDashboard,
+  onNavigateToAuth,
 }: LandingPageProps) {
-  const [authModalOpen, setAuthModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -30,14 +30,16 @@ export function LandingPage({
     }, 3800);
   };
 
-  const handleOpenAuth = () => {
-    setAuthModalOpen(true);
+  const handleOpenAuth = (mode: 'login' | 'register' = 'login') => {
+    if (onNavigateToAuth) {
+      onNavigateToAuth(mode);
+    }
   };
 
   const handleEnrollCourse = (course: { title: string }) => {
     if (!currentUser) {
       showToast(`Please sign in to enroll in "${course.title}". Opening sign-in...`);
-      setTimeout(() => setAuthModalOpen(true), 600);
+      setTimeout(() => handleOpenAuth('login'), 600);
     } else {
       showToast(`Successfully enrolled in "${course.title}"! Welcome to the cohort.`);
     }
@@ -65,7 +67,7 @@ export function LandingPage({
   return (
     <div className="landing-page-root">
       <Navbar
-        onOpenAuth={handleOpenAuth}
+        onOpenAuth={(mode) => handleOpenAuth(mode === 'register' ? 'register' : 'login')}
         currentUser={currentUser}
         onLogout={onLogout}
         onOpenDashboard={onOpenDashboard}
@@ -75,7 +77,7 @@ export function LandingPage({
         <HeroSection
           onBrowseCourses={handleBrowseCourses}
           onGetRecommendations={handleGetRecommendations}
-          onOpenAuth={handleOpenAuth}
+          onOpenAuth={(mode) => handleOpenAuth(mode)}
         />
 
         <MetricsStrip />
@@ -85,48 +87,12 @@ export function LandingPage({
         <HowItWorks />
 
         <AiDemoSection
-          onStartFree={() => (currentUser ? onOpenDashboard?.() : handleOpenAuth())}
+          onStartFree={() => (currentUser ? onOpenDashboard?.() : handleOpenAuth('register'))}
           onExplorePedagogy={handleExplorePedagogy}
         />
       </main>
 
-      <Footer onOpenAuth={handleOpenAuth} />
-
-      {/* Auth Modal */}
-      {authModalOpen && !currentUser && (
-        <div
-          className="auth-modal-backdrop"
-          onClick={() => setAuthModalOpen(false)}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div
-            className="auth-modal-card"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="auth-modal-header">
-              <div className="auth-modal-brand">
-                <img src="/logo.png" alt="Mentora" className="auth-modal-logo" />
-                <span className="auth-modal-brand-title">Mentora Account</span>
-              </div>
-              <button
-                type="button"
-                className="auth-modal-close-btn"
-                onClick={() => setAuthModalOpen(false)}
-                aria-label="Close authentication modal"
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
-                  close
-                </span>
-              </button>
-            </div>
-
-            <div className="auth-modal-body">
-              <LoginForm />
-            </div>
-          </div>
-        </div>
-      )}
+      <Footer onOpenAuth={(mode) => handleOpenAuth(mode === 'register' ? 'register' : 'login')} />
 
       {/* Notification Toast */}
       {toastMessage && (
