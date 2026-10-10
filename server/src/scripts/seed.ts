@@ -9,12 +9,14 @@ interface SeedCourse {
   title: string;
   description: string;
   content: string;
+  category: string;
 }
 
 const SAMPLE_COURSES: SeedCourse[] = [
   {
     title: 'Full-Stack Web Development with React and Node.js',
     description: 'Learn to build modern, scalable web applications using React 19, Express 5, and MongoDB.',
+    category: 'web-development',
     content: `Module 1: Full-Stack Architecture Foundations
 - Client-server models and REST APIs
 - Monorepos and project structures
@@ -34,6 +36,7 @@ Module 4: MongoDB & Mongoose
   {
     title: 'Advanced TypeScript for Enterprise Applications',
     description: 'Master advanced TypeScript patterns, strict typing, generics, and end-to-end type safety.',
+    category: 'programming',
     content: `Module 1: Advanced Type System
 - Conditional types, template literals, infer keyword
 - Discriminated unions and exhaustive type checking
@@ -45,6 +48,7 @@ Module 2: Strict Architecture
   {
     title: 'Database Engineering with MongoDB & Mongoose',
     description: 'Design resilient database schemas, query optimizations, and production indexing strategies.',
+    category: 'databases',
     content: `Module 1: Schema Modeling
 - Embedding vs referencing relationships
 - Validation schemas with Mongoose
@@ -100,6 +104,7 @@ async function seed(): Promise<void> {
           title: courseData.title,
           description: courseData.description,
           content: courseData.content,
+          category: courseData.category,
           instructor: instructor._id,
         });
         console.log(`✅ Seeded course: "${courseData.title}"`);
