@@ -1,10 +1,10 @@
 .register-page-wrapper {
   min-height: 100vh;
+  padding-top: 88px;
   background-color: var(--surface);
   color: var(--on-surface);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   font-family: var(--font-body);
 }
 
@@ -16,6 +16,7 @@
   padding: 1.25rem;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 @media (min-width: 1024px) {
@@ -26,21 +27,14 @@
 
 .register-card-split {
   width: 100%;
+  max-width: 560px;
   background: var(--surface-container-lowest);
   border-radius: var(--radius-2xl);
   box-shadow: 0 16px 40px rgba(0, 35, 111, 0.08);
   border: 1px solid rgba(229, 238, 255, 0.9);
   overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr;
-  min-height: auto;
-}
-
-@media (min-width: 1024px) {
-  .register-card-split {
-    grid-template-columns: 1.35fr 1fr;
-    min-height: 780px;
-  }
+  display: flex;
+  flex-direction: column;
 }
 
 /* Left Column: Register Form */
@@ -305,4 +299,109 @@
   height: 3px;
   border-radius: 50%;
   background: var(--outline-variant);
+}
+
+/* Role Selector (Student vs Instructor) */
+.role-selector-container {
+  margin-bottom: 1.25rem;
+}
+
+.role-selector-label {
+  font-size: 0.825rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--on-surface-variant);
+  margin-bottom: 0.5rem;
+}
+
+.role-selector-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.role-card-btn {
+  background: var(--surface-container-low);
+  border: 2px solid var(--outline-light);
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.role-card-btn:hover {
+  background: var(--surface-container);
+  border-color: var(--secondary-fixed-dim);
+}
+
+.role-card-btn.active {
+  background: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 4px 14px rgba(0, 35, 111, 0.12);
+}
+
+.role-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.role-card-header .role-icon {
+  font-size: 22px;
+  color: var(--primary);
+}
+
+.role-card-btn.active .role-card-header .role-icon {
+  color: var(--secondary);
+}
+
+.role-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-full);
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+}
+
+.role-card-btn.active .role-badge {
+  background: var(--secondary-fixed);
+  color: var(--primary);
+}
+
+.role-card-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 0.2rem;
+}
+
+.role-card-desc {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+
+/* Auth Error Alert */
+.auth-error-alert {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }

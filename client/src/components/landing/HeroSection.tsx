@@ -79,12 +79,7 @@ export function HeroSection({
       <div className="hero-ambient-glow" />
 
       <div className="hero-container">
-        {/* Readiness Pill */}
-        <div className="hero-pill-badge">
-          <span className="material-symbols-outlined spark-icon">auto_awesome</span>
-          <span className="hero-pill-text">Mentora Neural Tutor 3.2 Live</span>
-          <span className="hero-pill-pulse" />
-        </div>
+
 
         {/* Title */}
         <h1 className="hero-title">

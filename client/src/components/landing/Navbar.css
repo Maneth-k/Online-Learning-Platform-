@@ -92,6 +92,7 @@
   transition: color 0.2s ease;
   position: relative;
   padding: 0.25rem 0;
+  text-decoration: none;
 }
 
 .nav-link:hover,
@@ -131,6 +132,8 @@
   padding: 0.5rem 0.875rem;
   border-radius: var(--radius-md);
   transition: all 0.2s ease;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .btn-signin:hover {
@@ -151,6 +154,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .btn-get-started:hover {
@@ -260,6 +265,7 @@
   color: var(--on-surface);
   padding: 0.5rem 0;
   border-bottom: 1px solid var(--surface-container-low);
+  text-decoration: none;
 }
 
 .mobile-nav-link:hover {

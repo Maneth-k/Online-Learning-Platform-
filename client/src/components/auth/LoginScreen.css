@@ -1,11 +1,24 @@
 .auth-page-wrapper {
   min-height: 100vh;
+  padding-top: 88px;
   background-color: var(--surface);
   color: var(--on-surface);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   font-family: var(--font-body);
+}
+
+.auth-error-alert {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .auth-header {
@@ -104,6 +117,7 @@
   padding: 1.25rem;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 @media (min-width: 1024px) {
@@ -114,21 +128,14 @@
 
 .auth-card-split {
   width: 100%;
+  max-width: 480px;
   background: var(--surface-container-lowest);
   border-radius: var(--radius-2xl);
   box-shadow: 0 16px 40px rgba(0, 35, 111, 0.08);
   border: 1px solid rgba(229, 238, 255, 0.9);
   overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr;
-  min-height: auto;
-}
-
-@media (min-width: 1024px) {
-  .auth-card-split {
-    grid-template-columns: 1.35fr 1fr;
-    min-height: 720px;
-  }
+  display: flex;
+  flex-direction: column;
 }
 
 /* Left Column: Form Panel */

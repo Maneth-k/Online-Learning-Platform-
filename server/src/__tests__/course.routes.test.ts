@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import { createTestApp } from './helpers.js';
 import Course from '../models/Course.js';
+import Enrollment from '../models/Enrollment.js';
 import { signToken, AUTH_COOKIE_NAME } from '../utils/jwt.js';
 
 describe('Course Routes (courseRoutes.ts HTTP Integration)', () => {
@@ -678,6 +679,7 @@ describe('Course Routes (courseRoutes.ts HTTP Integration)', () => {
 
       vi.spyOn(Course, 'findById').mockResolvedValue(existingCourse as any);
       const deleteSpy = vi.spyOn(Course, 'findByIdAndDelete').mockResolvedValue(existingCourse as any);
+      const enrollmentUpdateSpy = vi.spyOn(Enrollment, 'updateMany').mockResolvedValue({ acknowledged: true, modifiedCount: 1 } as any);
 
       const res = await request(app)
         .delete(`/api/courses/${validCourseId}`)
@@ -686,6 +688,10 @@ describe('Course Routes (courseRoutes.ts HTTP Integration)', () => {
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.message).toBe('Course deleted successfully');
+      expect(enrollmentUpdateSpy).toHaveBeenCalledWith(
+        { course: validCourseId },
+        { $set: { status: 'dropped' } }
+      );
       expect(deleteSpy).toHaveBeenCalledWith(validCourseId);
     });
 

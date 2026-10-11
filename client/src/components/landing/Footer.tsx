@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './Footer.css';
 
 interface FooterProps {
@@ -13,17 +14,16 @@ export function Footer({ onOpenAuth }: FooterProps) {
       <div className="footer-container">
         <div className="footer-grid">
           <div className="footer-brand-col">
-            <a
-              href="#"
+            <Link
+              to="/"
               className="footer-brand-link"
-              onClick={(e) => {
-                e.preventDefault();
+              onClick={() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
             >
               <img src="/logo.png" alt="Mentora" className="footer-logo-img" />
               <span className="footer-brand-name">Mentora</span>
-            </a>
+            </Link>
             <p className="footer-description">
               AI-augmented scholarly mentorship engineered for focused learners, university scholars, and modern lifelong practitioners.
             </p>
@@ -37,16 +37,19 @@ export function Footer({ onOpenAuth }: FooterProps) {
             <h4 className="footer-col-title">Platform</h4>
             <ul className="footer-links-list">
               <li className="footer-link-item">
-                <a href="#hero-synthesis">AI Goal Synthesis</a>
+                <a href="/#hero-synthesis">AI Goal Synthesis</a>
               </li>
               <li className="footer-link-item">
-                <a href="#ai-pedagogy">Socratic Feedback Engine</a>
+                <a href="/#ai-pedagogy">Socratic Feedback Engine</a>
               </li>
               <li className="footer-link-item">
-                <a href="#how-it-works">The Mentora Cycle</a>
+                <a href="/#how-it-works">The Mentora Cycle</a>
               </li>
               <li className="footer-link-item">
-                <a href="#featured-courses">Curriculum Catalog</a>
+                <Link to="/courses">Curriculum Catalog</Link>
+              </li>
+              <li className="footer-link-item">
+                <Link to="/instructors">Distinguished Instructors</Link>
               </li>
               <li className="footer-link-item">
                 <a
@@ -66,19 +69,19 @@ export function Footer({ onOpenAuth }: FooterProps) {
             <h4 className="footer-col-title">Tracks</h4>
             <ul className="footer-links-list">
               <li className="footer-link-item">
-                <a href="#featured-courses">Full-Stack Systems</a>
+                <Link to="/courses">Full-Stack Systems</Link>
               </li>
               <li className="footer-link-item">
-                <a href="#featured-courses">Applied Machine Learning</a>
+                <Link to="/courses">Applied Machine Learning</Link>
               </li>
               <li className="footer-link-item">
-                <a href="#featured-courses">Product Strategy & AI</a>
+                <Link to="/courses">Product Strategy & AI</Link>
               </li>
               <li className="footer-link-item">
-                <a href="#featured-courses">Cloud & DevOps Mastery</a>
+                <Link to="/courses">Cloud & DevOps Mastery</Link>
               </li>
               <li className="footer-link-item">
-                <a href="#featured-courses">Executive Leadership</a>
+                <Link to="/courses">Executive Leadership</Link>
               </li>
             </ul>
           </div>

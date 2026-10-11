@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Navbar } from './Navbar';
+import { useNavigate } from 'react-router-dom';
+import { useCurrentUser } from '../../hooks/useAuth.js';
 import { HeroSection } from './HeroSection';
 import { MetricsStrip } from './MetricsStrip';
 import { FeaturedCourses } from './FeaturedCourses';
@@ -13,14 +14,20 @@ interface LandingPageProps {
   onLogout?: () => void;
   onOpenDashboard?: () => void;
   onNavigateToAuth?: (mode: 'login' | 'register') => void;
+  onOpenCreateCourse?: () => void;
+  onOpenInstructors?: () => void;
+  onOpenCourses?: () => void;
 }
 
 export function LandingPage({
-  currentUser,
-  onLogout,
-  onOpenDashboard,
+  currentUser: propUser,
   onNavigateToAuth,
-}: LandingPageProps) {
+  onOpenCourses,
+}: LandingPageProps = {}) {
+  const { data: hookUser } = useCurrentUser();
+  const currentUser = propUser !== undefined ? propUser : hookUser;
+  const navigate = useNavigate();
+
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -33,6 +40,8 @@ export function LandingPage({
   const handleOpenAuth = (mode: 'login' | 'register' = 'login') => {
     if (onNavigateToAuth) {
       onNavigateToAuth(mode);
+    } else {
+      navigate(`/${mode}`);
     }
   };
 
@@ -46,8 +55,11 @@ export function LandingPage({
   };
 
   const handleBrowseCourses = () => {
-    const el = document.getElementById('featured-courses');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    if (onOpenCourses) {
+      onOpenCourses();
+    } else {
+      navigate('/courses');
+    }
   };
 
   const handleGetRecommendations = () => {
@@ -66,13 +78,6 @@ export function LandingPage({
 
   return (
     <div className="landing-page-root">
-      <Navbar
-        onOpenAuth={(mode) => handleOpenAuth(mode === 'register' ? 'register' : 'login')}
-        currentUser={currentUser}
-        onLogout={onLogout}
-        onOpenDashboard={onOpenDashboard}
-      />
-
       <main className="landing-main-content">
         <HeroSection
           onBrowseCourses={handleBrowseCourses}
@@ -87,7 +92,7 @@ export function LandingPage({
         <HowItWorks />
 
         <AiDemoSection
-          onStartFree={() => (currentUser ? onOpenDashboard?.() : handleOpenAuth('register'))}
+          onStartFree={() => (currentUser ? navigate('/dashboard') : handleOpenAuth('register'))}
           onExplorePedagogy={handleExplorePedagogy}
         />
       </main>
@@ -109,3 +114,5 @@ export function LandingPage({
     </div>
   );
 }
+
+export default LandingPage;

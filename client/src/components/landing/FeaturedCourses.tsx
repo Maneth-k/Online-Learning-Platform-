@@ -159,7 +159,14 @@ export function FeaturedCourses({ onEnroll }: FeaturedCoursesProps) {
               </div>
 
               <div className="course-card-content">
-                <div className="course-instructor-row">
+                <div
+                  className="course-instructor-row"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    window.location.hash = 'instructors';
+                  }}
+                  title={`View instructors profile for ${course.instructor}`}
+                >
                   <span className="material-symbols-outlined instructor-icon">
                     verified_user
                   </span>

@@ -1,10 +1,13 @@
 import { Schema, model, type Document, type Model, Types } from 'mongoose';
 
+export type EnrollmentStatus = 'enrolled' | 'completed' | 'dropped';
+
 export interface IEnrollment {
   student: Types.ObjectId;
   course: Types.ObjectId;
-  status: string;
+  status: EnrollmentStatus;
   enrollmentDate: Date;
+  completedAt?: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -17,16 +20,18 @@ const enrollmentSchema = new Schema<IEnrollmentDocument>(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'Student reference is required'],
-      index: true,
     },
     course: {
       type: Schema.Types.ObjectId,
       ref: 'Course',
       required: [true, 'Course reference is required'],
-      index: true,
     },
     status: {
       type: String,
+      enum: {
+        values: ['enrolled', 'completed', 'dropped'],
+        message: '{VALUE} is not a valid enrollment status',
+      },
       default: 'enrolled',
       trim: true,
     },
@@ -34,6 +39,10 @@ const enrollmentSchema = new Schema<IEnrollmentDocument>(
       type: Date,
       default: Date.now,
       required: true,
+    },
+    completedAt: {
+      type: Date,
+      default: null,
     },
   },
   {

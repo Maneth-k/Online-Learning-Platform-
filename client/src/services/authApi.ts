@@ -46,10 +46,9 @@ export async function loginUser(input: LoginInput): Promise<User> {
 }
 
 /**
- * Register a new Student.
- * NOTE: Frontend strictly registers students (role: 'student').
+ * Register a new user (Student or Instructor).
  */
-export async function registerStudent(input: RegisterInput): Promise<User> {
+export async function registerUser(input: RegisterInput): Promise<User> {
   const response = await fetch(`${API_BASE}/register`, {
     method: 'POST',
     headers: {
@@ -59,7 +58,7 @@ export async function registerStudent(input: RegisterInput): Promise<User> {
     body: JSON.stringify({
       username: input.username,
       password: input.password,
-      role: 'student',
+      role: input.role || 'student',
     }),
   });
 
@@ -71,6 +70,11 @@ export async function registerStudent(input: RegisterInput): Promise<User> {
 
   return result.data.user;
 }
+
+/**
+ * Backwards compatibility alias for student registration.
+ */
+export const registerStudent = registerUser;
 
 /**
  * Log out user by clearing the server auth cookie.

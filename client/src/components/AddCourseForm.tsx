@@ -1,12 +1,8 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useState, type FormEvent } from 'react';
 import { useCreateCourse } from '../hooks/useCourses.js';
-import {
-  createCourseSchema,
-  type CreateCourseFormData,
-} from '../schemas/courseSchemas.js';
+import { createCourseSchema } from '../schemas/courseSchemas.js';
 import type { Course } from '../types/course.js';
+import './course/CreateCourseScreen.css';
 
 export interface AddCourseFormProps {
   onSuccess?: (course: Course) => void;
@@ -14,125 +10,162 @@ export interface AddCourseFormProps {
 }
 
 export function AddCourseForm({ onSuccess, onCancel }: AddCourseFormProps) {
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('');
+  const [description, setDescription] = useState('');
+  const [content, setContent] = useState('');
+
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
   const createCourseMutation = useCreateCourse();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<CreateCourseFormData>({
-    resolver: zodResolver(createCourseSchema),
-  });
-
-  const onSubmit = (data: CreateCourseFormData) => {
-    setSuccessMessage(null);
-    createCourseMutation.mutate(data, {
-      onSuccess: (newCourse) => {
-        setSuccessMessage('Course created successfully!');
-        reset();
-        onSuccess?.(newCourse);
-      },
-    });
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const isPending = isSubmitting || createCourseMutation.isPending;
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const parseResult = createCourseSchema.safeParse({
+      title: title.trim(),
+      category: category.trim(),
+      description: description.trim(),
+      content: content.trim(),
+    });
+
+    if (!parseResult.success) {
+      showToast(parseResult.error.issues[0]?.message || 'Please fill in all required fields');
+      return;
+    }
+
+    createCourseMutation.mutate(
+      parseResult.data,
+      {
+        onSuccess: (newCourse) => {
+          showToast('Course module published successfully!');
+          onSuccess?.(newCourse);
+        },
+        onError: (err) => {
+          showToast(err instanceof Error ? err.message : 'Failed to publish course');
+        },
+      }
+    );
+  };
+
 
   return (
-    <div style={{ margin: '20px', maxWidth: '480px' }}>
-      <h2>Add Course</h2>
+    <div className="course-studio-container" style={{ margin: '0 auto' }}>
+      {/* Top Action Header */}
+      <div className="studio-title-row">
+        <div className="studio-title-group">
+          <h1>Create Course Content</h1>
+          <p>Fill in the details below to publish your course content.</p>
+        </div>
+      </div>
 
-      {createCourseMutation.error && (
-        <p style={{ color: 'red', marginTop: '8px', marginBottom: '8px' }}>
-          {createCourseMutation.error instanceof Error
-            ? createCourseMutation.error.message
-            : 'Failed to create course'}
-        </p>
-      )}
-
-      {successMessage && (
-        <p style={{ color: 'green', marginTop: '8px', marginBottom: '8px' }}>
-          {successMessage}
-        </p>
-      )}
-
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div style={{ marginBottom: '12px' }}>
-          <label htmlFor="course-title" style={{ display: 'block', marginBottom: '4px' }}>
-            Course Title:
+      {/* Form Card */}
+      <form className="course-studio-card" onSubmit={handleSubmit} noValidate>
+        {/* Title */}
+        <div className="form-field-group">
+          <label htmlFor="lessonTitle-embedded" className="form-field-label">
+            <span>Title</span>
+            <span className="label-required-asterisk" title="Required">*</span>
           </label>
           <input
-            id="course-title"
+            id="lessonTitle-embedded"
             type="text"
-            placeholder="e.g. Full-Stack Web Development"
-            {...register('title')}
-            style={{ width: '100%', padding: '6px', boxSizing: 'border-box' }}
+            className="studio-input"
+            placeholder="Enter lesson title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
           />
-          {errors.title && (
-            <span style={{ color: 'red', fontSize: '13px', display: 'block', marginTop: '4px' }}>
-              {errors.title.message}
-            </span>
-          )}
         </div>
 
-        <div style={{ marginBottom: '12px' }}>
-          <label htmlFor="course-description" style={{ display: 'block', marginBottom: '4px' }}>
-            Course Description:
+        {/* Category */}
+        <div className="form-field-group">
+          <label htmlFor="courseCategory-embedded" className="form-field-label">
+            <span>Category</span>
+            <span className="label-required-asterisk" title="Required">*</span>
+          </label>
+          <input
+            id="courseCategory-embedded"
+            type="text"
+            className="studio-input"
+            placeholder="Enter course category (e.g. Engineering, Design, Business)"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Description */}
+        <div className="form-field-group">
+          <label htmlFor="lessonDesc-embedded" className="form-field-label">
+            <span>Description</span>
+            <span className="label-required-asterisk" title="Required">*</span>
           </label>
           <textarea
-            id="course-description"
+            id="lessonDesc-embedded"
+            className="studio-textarea-desc"
             rows={3}
-            placeholder="Brief description of the course content"
-            {...register('description')}
-            style={{ width: '100%', padding: '6px', boxSizing: 'border-box' }}
+            placeholder="Provide a brief overview of this course..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
           />
-          {errors.description && (
-            <span style={{ color: 'red', fontSize: '13px', display: 'block', marginTop: '4px' }}>
-              {errors.description.message}
-            </span>
-          )}
         </div>
 
-        <div style={{ marginBottom: '16px' }}>
-          <label htmlFor="course-content" style={{ display: 'block', marginBottom: '4px' }}>
-            Course Content:
+        {/* Content */}
+        <div className="form-field-group">
+          <label htmlFor="lessonContent-embedded" className="form-field-label">
+            <span>Content</span>
+            <span className="label-required-asterisk" title="Required">*</span>
           </label>
           <textarea
-            id="course-content"
-            rows={5}
-            placeholder="Detailed course curriculum and materials"
-            {...register('content')}
-            style={{ width: '100%', padding: '6px', boxSizing: 'border-box' }}
+            id="lessonContent-embedded"
+            className="studio-textarea-content"
+            rows={10}
+            placeholder="Enter course content..."
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            required
           />
-          {errors.content && (
-            <span style={{ color: 'red', fontSize: '13px', display: 'block', marginTop: '4px' }}>
-              {errors.content.message}
-            </span>
-          )}
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <button
-            type="submit"
-            disabled={isPending}
-            style={{ padding: '8px 16px', cursor: 'pointer' }}
-          >
-            {isPending ? 'Creating Course...' : 'Create Course'}
-          </button>
-
+        {/* Footer */}
+        <div className="form-card-footer">
           {onCancel && (
             <button
               type="button"
+              className="btn-form-cancel"
               onClick={onCancel}
-              disabled={isPending}
-              style={{ padding: '8px 16px', cursor: 'pointer' }}
             >
               Cancel
             </button>
           )}
+          <button
+            type="submit"
+            className="btn-form-submit"
+            disabled={createCourseMutation.isPending}
+          >
+            {createCourseMutation.isPending ? 'Publishing...' : 'Save'}
+          </button>
         </div>
       </form>
+
+      {/* Floating Toast */}
+      {toastMessage && (
+        <div className="studio-floating-toast" role="status">
+          <span
+            className="material-symbols-outlined"
+            style={{ fontSize: '20px', color: '#6bd8cb' }}
+          >
+            check_circle
+          </span>
+          <span>{toastMessage}</span>
+        </div>
+      )}
     </div>
   );
 }

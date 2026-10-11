@@ -10,7 +10,6 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
   try {
     let token: string | undefined = req.cookies?.[AUTH_COOKIE_NAME];
 
-    // Fallback: Check Authorization header if cookie is absent
     if (!token && req.headers.authorization?.startsWith('Bearer ')) {
       token = req.headers.authorization.split(' ')[1];
     }

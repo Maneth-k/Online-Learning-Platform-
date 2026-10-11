@@ -1,16 +1,38 @@
 import { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useCurrentUser, useLogout } from '../../hooks/useAuth.js';
 import './Navbar.css';
 
 interface NavbarProps {
-  onOpenAuth: (mode?: 'login' | 'register') => void;
+  onOpenAuth?: (mode?: 'login' | 'register') => void;
   currentUser?: { username: string; role: string } | null;
   onLogout?: () => void;
   onOpenDashboard?: () => void;
+  onOpenCreateCourse?: () => void;
+  onOpenInstructors?: () => void;
+  onOpenCourses?: () => void;
+  onNavigateHome?: () => void;
 }
 
-export function Navbar({ onOpenAuth, currentUser, onLogout, onOpenDashboard }: NavbarProps) {
+export function Navbar({
+  onOpenAuth,
+  currentUser: propUser,
+  onLogout,
+  onOpenDashboard,
+  onOpenCreateCourse: _onOpenCreateCourse,
+  onOpenInstructors,
+  onOpenCourses,
+  onNavigateHome,
+}: NavbarProps = {}) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const { data: hookUser } = useCurrentUser();
+  const currentUser = propUser !== undefined ? propUser : hookUser;
+
+  const logoutMutation = useLogout();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,11 +42,34 @@ export function Navbar({ onOpenAuth, currentUser, onLogout, onOpenDashboard }: N
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToSection = (id: string) => {
+  const handleBrandClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onNavigateHome) {
+      onNavigateHome();
+    } else {
+      navigate('/');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleHowItWorksClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     setMobileMenuOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (location.pathname === '/') {
+      const element = document.getElementById('how-it-works');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+    }
+    navigate('/#how-it-works');
+  };
+
+  const handleLogoutClick = () => {
+    if (onLogout) {
+      onLogout();
+    } else {
+      logoutMutation.mutate();
     }
   };
 
@@ -32,39 +77,42 @@ export function Navbar({ onOpenAuth, currentUser, onLogout, onOpenDashboard }: N
     <header className={`mentora-navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="navbar-container">
         <div className="navbar-left">
-          <a href="#" className="navbar-brand" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+          <Link to="/" className="navbar-brand" onClick={handleBrandClick}>
             <img src="/logo.png" alt="Mentora Logo" className="brand-logo-img" />
             <span className="brand-name">Mentora</span>
-          </a>
+          </Link>
 
           <nav className="navbar-nav-links" aria-label="Main Navigation">
-            <a
-              href="#courses"
-              className="nav-link"
-              onClick={(e) => { e.preventDefault(); scrollToSection('featured-courses'); }}
+            <Link
+              to="/courses"
+              className={`nav-link ${location.pathname === '/courses' ? 'active' : ''}`}
+              onClick={(e) => {
+                if (onOpenCourses) {
+                  e.preventDefault();
+                  onOpenCourses();
+                }
+              }}
             >
               Courses
-            </a>
+            </Link>
+            <Link
+              to="/instructors"
+              className={`nav-link ${location.pathname === '/instructors' ? 'active' : ''}`}
+              onClick={(e) => {
+                if (onOpenInstructors) {
+                  e.preventDefault();
+                  onOpenInstructors();
+                }
+              }}
+            >
+              Instructors
+            </Link>
             <a
-              href="#how-it-works"
+              href="/#how-it-works"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); scrollToSection('how-it-works'); }}
+              onClick={handleHowItWorksClick}
             >
               How It Works
-            </a>
-            <a
-              href="#ai-pedagogy"
-              className="nav-link"
-              onClick={(e) => { e.preventDefault(); scrollToSection('ai-pedagogy'); }}
-            >
-              AI Pedagogy
-            </a>
-            <a
-              href="#synthesis"
-              className="nav-link"
-              onClick={(e) => { e.preventDefault(); scrollToSection('hero-synthesis'); }}
-            >
-              AI Roadmap
             </a>
           </nav>
         </div>
@@ -79,7 +127,7 @@ export function Navbar({ onOpenAuth, currentUser, onLogout, onOpenDashboard }: N
                 <span className="user-info-text">{currentUser.username}</span>
                 <span className="user-role-tag">{currentUser.role}</span>
               </div>
-              {onOpenDashboard && (
+              {onOpenDashboard ? (
                 <button
                   type="button"
                   className="btn-signin"
@@ -88,35 +136,69 @@ export function Navbar({ onOpenAuth, currentUser, onLogout, onOpenDashboard }: N
                 >
                   Dashboard
                 </button>
-              )}
-              {onLogout && (
-                <button
-                  type="button"
-                  className="btn-logout-nav"
-                  onClick={onLogout}
-                  title="Sign out"
+              ) : (
+                <Link
+                  to="/dashboard"
+                  className="btn-signin"
+                  style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem', textDecoration: 'none' }}
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>logout</span>
-                </button>
+                  Dashboard
+                </Link>
               )}
+              <button
+                type="button"
+                className="btn-logout-nav"
+                onClick={handleLogoutClick}
+                title="Sign out"
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                  logout
+                </span>
+              </button>
             </div>
           ) : (
             <>
-              <button
-                type="button"
-                className="btn-signin"
-                onClick={() => onOpenAuth('login')}
-              >
-                Sign In
-              </button>
-              <button
-                type="button"
-                className="btn-get-started"
-                onClick={() => onOpenAuth('register')}
-              >
-                <span>Get Started</span>
-                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
-              </button>
+              {onOpenAuth ? (
+                <button
+                  type="button"
+                  className="btn-signin"
+                  onClick={() => onOpenAuth('login')}
+                >
+                  Sign In
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  className="btn-signin"
+                  style={{ textDecoration: 'none' }}
+                >
+                  Sign In
+                </Link>
+              )}
+
+              {onOpenAuth ? (
+                <button
+                  type="button"
+                  className="btn-get-started"
+                  onClick={() => onOpenAuth('register')}
+                >
+                  <span>Get Started</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                    arrow_forward
+                  </span>
+                </button>
+              ) : (
+                <Link
+                  to="/register"
+                  className="btn-get-started"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <span>Get Started</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                    arrow_forward
+                  </span>
+                </Link>
+              )}
             </>
           )}
 
@@ -135,53 +217,84 @@ export function Navbar({ onOpenAuth, currentUser, onLogout, onOpenDashboard }: N
 
       {mobileMenuOpen && (
         <div className="mobile-menu-dropdown">
-          <a
-            href="#courses"
+          <Link
+            to="/courses"
             className="mobile-nav-link"
-            onClick={(e) => { e.preventDefault(); scrollToSection('featured-courses'); }}
+            onClick={(e) => {
+              setMobileMenuOpen(false);
+              if (onOpenCourses) {
+                e.preventDefault();
+                onOpenCourses();
+              }
+            }}
           >
             Courses
-          </a>
-          <a
-            href="#how-it-works"
+          </Link>
+          <Link
+            to="/instructors"
             className="mobile-nav-link"
-            onClick={(e) => { e.preventDefault(); scrollToSection('how-it-works'); }}
+            onClick={(e) => {
+              setMobileMenuOpen(false);
+              if (onOpenInstructors) {
+                e.preventDefault();
+                onOpenInstructors();
+              }
+            }}
+          >
+            Instructors
+          </Link>
+          <a
+            href="/#how-it-works"
+            className="mobile-nav-link"
+            onClick={handleHowItWorksClick}
           >
             How It Works
           </a>
-          <a
-            href="#ai-pedagogy"
-            className="mobile-nav-link"
-            onClick={(e) => { e.preventDefault(); scrollToSection('ai-pedagogy'); }}
-          >
-            AI Pedagogy
-          </a>
-          <a
-            href="#synthesis"
-            className="mobile-nav-link"
-            onClick={(e) => { e.preventDefault(); scrollToSection('hero-synthesis'); }}
-          >
-            AI Roadmap
-          </a>
 
-          {!currentUser && (
+          {currentUser ? (
             <div className="mobile-actions">
+              <Link
+                to="/dashboard"
+                className="btn-signin"
+                style={{ textAlign: 'center', width: '100%', textDecoration: 'none' }}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
               <button
                 type="button"
                 className="btn-signin"
-                style={{ textAlign: 'center', width: '100%' }}
-                onClick={() => { setMobileMenuOpen(false); onOpenAuth('login'); }}
+                style={{
+                  textAlign: 'center',
+                  width: '100%',
+                  border: '1px solid var(--outline-variant)',
+                }}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleLogoutClick();
+                }}
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <div className="mobile-actions">
+              <Link
+                to="/login"
+                className="btn-signin"
+                style={{ textAlign: 'center', width: '100%', textDecoration: 'none' }}
+                onClick={() => setMobileMenuOpen(false)}
               >
                 Sign In
-              </button>
-              <button
-                type="button"
+              </Link>
+              <Link
+                to="/register"
                 className="btn-get-started"
-                style={{ justifyContent: 'center', width: '100%' }}
-                onClick={() => { setMobileMenuOpen(false); onOpenAuth('register'); }}
+                style={{ justifyContent: 'center', width: '100%', textDecoration: 'none' }}
+                onClick={() => setMobileMenuOpen(false)}
               >
                 Get Started Free
-              </button>
+              </Link>
             </div>
           )}
         </div>

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchCurrentUser, loginUser, registerStudent, logoutUser } from '../services/authApi.js';
+import { fetchCurrentUser, loginUser, registerUser, logoutUser } from '../services/authApi.js';
 import type { LoginInput, RegisterInput, User } from '../types/auth.js';
 
 export const AUTH_QUERY_KEY = ['auth', 'user'] as const;
@@ -23,15 +23,17 @@ export function useLogin() {
   });
 }
 
-export function useRegisterStudent() {
+export function useRegister() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (credentials: RegisterInput) => registerStudent(credentials),
+    mutationFn: (credentials: RegisterInput) => registerUser(credentials),
     onSuccess: (user: User) => {
       queryClient.setQueryData(AUTH_QUERY_KEY, user);
     },
   });
 }
+
+export const useRegisterStudent = useRegister;
 
 export function useLogout() {
   const queryClient = useQueryClient();

@@ -114,6 +114,11 @@ function RegisterView({ onToggleMode }: FormToggleProps) {
     formState: { errors, isSubmitting },
   } = useForm<RegisterStudentFormData>({
     resolver: zodResolver(registerStudentSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+      role: 'student',
+    },
   });
 
   const onSubmit = (data: RegisterStudentFormData) => {
@@ -124,7 +129,7 @@ function RegisterView({ onToggleMode }: FormToggleProps) {
 
   return (
     <div style={{ margin: '20px', maxWidth: '360px' }}>
-      <h2>Register (Students Only)</h2>
+      <h2>Register Account</h2>
 
       {registerMutation.error && (
         <p style={{ color: 'red' }}>
@@ -135,6 +140,20 @@ function RegisterView({ onToggleMode }: FormToggleProps) {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <div style={{ marginBottom: '10px' }}>
+          <label htmlFor="reg-role" style={{ display: 'block' }}>
+            Account Role:
+          </label>
+          <select
+            id="reg-role"
+            {...register('role')}
+            style={{ width: '100%', padding: '6px' }}
+          >
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+          </select>
+        </div>
+
         <div style={{ marginBottom: '10px' }}>
           <label htmlFor="reg-username" style={{ display: 'block' }}>
             Username:
@@ -176,7 +195,7 @@ function RegisterView({ onToggleMode }: FormToggleProps) {
           disabled={isPending}
           style={{ padding: '8px 16px', cursor: 'pointer' }}
         >
-          {isPending ? 'Registering...' : 'Register as Student'}
+          {isPending ? 'Registering...' : 'Register'}
         </button>
       </form>
 

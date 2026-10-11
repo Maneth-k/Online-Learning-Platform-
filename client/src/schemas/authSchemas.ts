@@ -14,7 +14,7 @@ export const loginSchema = z.object({
 
 export type LoginFormData = z.infer<typeof loginSchema>;
 
-export const registerStudentSchema = z.object({
+export const registerSchema = z.object({
   username: z
     .string()
     .trim()
@@ -24,6 +24,11 @@ export const registerStudentSchema = z.object({
     .string()
     .min(1, 'Password is required')
     .min(6, 'Password must be at least 6 characters long'),
+  role: z.enum(['student', 'instructor']),
 });
 
-export type RegisterStudentFormData = z.infer<typeof registerStudentSchema>;
+export type RegisterFormData = z.infer<typeof registerSchema>;
+
+// Backwards compatibility aliases
+export const registerStudentSchema = registerSchema;
+export type RegisterStudentFormData = RegisterFormData;

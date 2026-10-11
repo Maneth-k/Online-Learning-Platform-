@@ -6,6 +6,11 @@ export const createCourseSchema = z.object({
     .trim()
     .min(1, 'Course title is required')
     .max(200, 'Course title cannot exceed 200 characters'),
+  category: z
+    .string()
+    .trim()
+    .min(1, 'Course category is required')
+    .max(100, 'Course category cannot exceed 100 characters'),
   description: z
     .string()
     .trim()

@@ -22,4 +22,5 @@ export interface LoginInput {
 export interface RegisterInput {
   username: string;
   password: string;
+  role?: UserRole;
 }

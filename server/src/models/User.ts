@@ -71,8 +71,6 @@ userSchema.methods.comparePassword = async function (candidate: string): Promise
   return bcrypt.compare(candidate, this.password);
 };
 
-// Indexes
-userSchema.index({ username: 1 }, { unique: true });
 
 export const User: Model<IUserDocument> = model<IUserDocument>('User', userSchema);
 export default User;

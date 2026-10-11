@@ -33,7 +33,6 @@ const courseSchema = new Schema<ICourseDocument>(
       type: String,
       required: [true, 'Course category is required'],
       trim: true,
-      index: true,
     },
     instructor: {
       type: Schema.Types.ObjectId,
@@ -48,9 +47,7 @@ const courseSchema = new Schema<ICourseDocument>(
   }
 );
 
-// Index for efficient instructor course filtering
-courseSchema.index({ instructor: 1 });
-// Compound index for category filtering and sorted timeline queries
+
 courseSchema.index({ category: 1, createdAt: -1 });
 
 export const Course: Model<ICourseDocument> = model<ICourseDocument>('Course', courseSchema);

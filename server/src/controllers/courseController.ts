@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { Types, type QueryFilter } from 'mongoose';
 import { Course, type ICourseDocument } from '../models/Course.js';
+import { Enrollment } from '../models/Enrollment.js';
 import type { ActionResult } from '../types/actionResult.js';
 
 export interface CourseFilters {
@@ -434,6 +435,12 @@ export const deleteCourse = async (
       });
       return;
     }
+
+    // Archive all enrollments for this course (soft-cascade)
+    await Enrollment.updateMany(
+      { course: id },
+      { $set: { status: 'dropped' } }
+    );
 
     await Course.findByIdAndDelete(id);
 

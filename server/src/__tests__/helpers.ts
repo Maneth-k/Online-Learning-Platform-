@@ -2,6 +2,8 @@ import express, { type Application } from 'express';
 import cookieParser from 'cookie-parser';
 import authRoutes from '../routes/authRoutes.js';
 import courseRoutes from '../routes/courseRoutes.js';
+import enrollmentRoutes from '../routes/enrollmentRoutes.js';
+import instructorRoutes from '../routes/instructorRoutes.js';
 import type { Response as SupertestResponse } from 'supertest';
 
 /**
@@ -15,6 +17,8 @@ export const createTestApp = (): Application => {
   app.use(express.urlencoded({ extended: true }));
   app.use('/api/auth', authRoutes);
   app.use('/api/courses', courseRoutes);
+  app.use('/api/enrollments', enrollmentRoutes);
+  app.use('/api/instructors', instructorRoutes);
   return app;
 };
 

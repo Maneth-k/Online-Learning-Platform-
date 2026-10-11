@@ -1,13 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createCourse, fetchCourses } from '../services/courseApi.js';
-import type { CreateCourseInput, Course } from '../types/course.js';
+import { createCourse, fetchCourses, fetchCourseById } from '../services/courseApi.js';
+import type { CreateCourseInput, Course, CourseQueryFilters } from '../types/course.js';
 
 export const COURSES_QUERY_KEY = ['courses'] as const;
 
-export function useCourses() {
+export function useCourses(filters?: CourseQueryFilters) {
   return useQuery<Course[]>({
-    queryKey: COURSES_QUERY_KEY,
-    queryFn: fetchCourses,
+    queryKey: ['courses', filters] as const,
+    queryFn: () => fetchCourses(filters),
+  });
+}
+
+export function useCourse(id: string | undefined) {
+  return useQuery<Course>({
+    queryKey: ['course', id],
+    queryFn: () => fetchCourseById(id!),
+    enabled: Boolean(id),
   });
 }
 
@@ -20,3 +28,4 @@ export function useCreateCourse() {
     },
   });
 }
+
