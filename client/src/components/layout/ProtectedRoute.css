@@ -1,0 +1,84 @@
+.protected-route-loading {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--on-surface-variant, #444651);
+}
+
+.route-spinner {
+  font-size: 32px;
+  color: var(--primary, #00236f);
+  animation: routeSpin 1s linear infinite;
+}
+
+@keyframes routeSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.protected-role-denied-wrapper {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+}
+
+.protected-role-denied-card {
+  background: #ffffff;
+  border: 1px solid var(--outline-light, rgba(117, 118, 130, 0.18));
+  border-radius: var(--radius-xl, 1rem);
+  padding: 2.5rem 2rem;
+  max-width: 480px;
+  text-align: center;
+  box-shadow: var(--shadow-md, 0 4px 14px rgba(15, 23, 42, 0.06));
+}
+
+.denied-icon {
+  font-size: 48px;
+  color: #006398;
+  margin-bottom: 1rem;
+}
+
+.protected-role-denied-card h2 {
+  font-size: 1.5rem;
+  color: var(--primary, #00236f);
+  margin-bottom: 0.5rem;
+}
+
+.protected-role-denied-card p {
+  color: var(--on-surface-variant, #444651);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.denied-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-denied-primary {
+  padding: 0.65rem 1.25rem;
+  background: var(--primary, #00236f);
+  color: #ffffff;
+  border-radius: var(--radius-md, 0.5rem);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.btn-denied-secondary {
+  padding: 0.65rem 1.25rem;
+  background: var(--surface-container-low, #eff4ff);
+  color: var(--primary, #00236f);
+  border-radius: var(--radius-md, 0.5rem);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+}

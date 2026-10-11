@@ -57,3 +57,24 @@ export const authorizeRoles = (...roles: UserRole[]) => {
     next();
   };
 };
+
+/**
+ * Middleware that populates req.user if an authentication token is present,
+ * but allows unauthenticated visitors through if not.
+ */
+export const optionalAuthenticate = (req: Request, _res: Response, next: NextFunction): void => {
+  try {
+    let token: string | undefined = req.cookies?.[AUTH_COOKIE_NAME];
+
+    if (!token && req.headers.authorization?.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (token) {
+      req.user = verifyToken(token);
+    }
+  } catch {
+    // Ignore invalid/expired tokens for optional authentication
+  }
+  next();
+};

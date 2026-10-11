@@ -95,6 +95,16 @@ export function Navbar({
             >
               Courses
             </Link>
+            {currentUser?.role !== 'instructor' && (
+              <Link
+                to="/recommendations"
+                className={`nav-link ${location.pathname === '/recommendations' ? 'active' : ''}`}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+              >
+                <span>AI Advisor</span>
+               
+              </Link>
+            )}
             <Link
               to="/instructors"
               className={`nav-link ${location.pathname === '/instructors' ? 'active' : ''}`}
@@ -230,6 +240,19 @@ export function Navbar({
           >
             Courses
           </Link>
+          {currentUser?.role !== 'instructor' && (
+            <Link
+              to="/recommendations"
+              className="mobile-nav-link"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <span>AI Advisor</span>
+              <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#2563eb' }}>
+                auto_awesome
+              </span>
+            </Link>
+          )}
           <Link
             to="/instructors"
             className="mobile-nav-link"

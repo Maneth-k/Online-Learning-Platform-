@@ -25,6 +25,9 @@ export function RootLayout() {
     } else if (hash === '#dashboard') {
       window.history.replaceState(null, '', '/dashboard');
       navigate('/dashboard', { replace: true });
+    } else if (hash === '#recommendations' || hash === '#advisor' || hash === '#ai-advisor') {
+      window.history.replaceState(null, '', '/recommendations');
+      navigate('/recommendations', { replace: true });
     } else if (hash === '#create-course' || hash === '#new-course' || hash === '#create') {
       window.history.replaceState(null, '', '/create-course');
       navigate('/create-course', { replace: true });

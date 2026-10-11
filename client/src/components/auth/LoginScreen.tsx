@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useLogin } from '../../hooks/useAuth.js';
 import type { User } from '../../types/auth.js';
 import './LoginScreen.css';
@@ -16,6 +16,10 @@ export function LoginScreen({
   onSuccess,
 }: LoginScreenProps = {}) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const returnUrl = searchParams.get('returnUrl') || (location.state as any)?.from || '/dashboard';
+
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,7 +56,7 @@ export function LoginScreen({
           if (onSuccess) {
             onSuccess(user);
           } else {
-            navigate('/dashboard');
+            navigate(returnUrl, { replace: true });
           }
         },
         onError: (err) => {

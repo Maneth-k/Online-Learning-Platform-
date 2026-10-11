@@ -6,9 +6,17 @@ import {
   updateCourse,
   deleteCourse,
 } from '../controllers/courseController.js';
-import { authenticate, authorizeRoles } from '../middleware/auth.js';
+import {
+  getCourseRecommendationsHandler,
+  getAIUsageStatusHandler,
+} from '../controllers/recommendationController.js';
+import { authenticate, authorizeRoles, optionalAuthenticate } from '../middleware/auth.js';
 
 const router = Router();
+
+// Recommendations endpoints (must be defined before /:id)
+router.post('/recommendations', optionalAuthenticate, getCourseRecommendationsHandler);
+router.get('/recommendations/usage', getAIUsageStatusHandler);
 
 // Public routes
 router.get('/', getCourses);

@@ -49,6 +49,8 @@ const courseSchema = new Schema<ICourseDocument>(
 
 
 courseSchema.index({ category: 1, createdAt: -1 });
+// Text index for keyword candidate search (Step 2)
+courseSchema.index({ title: 'text', description: 'text' });
 
 export const Course: Model<ICourseDocument> = model<ICourseDocument>('Course', courseSchema);
 export default Course;

@@ -8,6 +8,8 @@ import { LoginScreen } from './components/auth/LoginScreen.js';
 import { RegisterScreen } from './components/auth/RegisterScreen.js';
 import { DashboardPage } from './components/dashboard/DashboardPage.js';
 import { CreateCourseScreen } from './components/course/CreateCourseScreen.js';
+import { RecommendationsPage } from './components/recommendations/RecommendationsPage.js';
+import { ProtectedRoute } from './components/layout/ProtectedRoute.js';
 
 export function App() {
   return (
@@ -18,6 +20,15 @@ export function App() {
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:id" element={<CourseDetailPage />} />
           <Route path="/course/:id" element={<CourseDetailPage />} />
+          <Route
+            path="/recommendations"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <RecommendationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/ai-advisor" element={<Navigate to="/recommendations" replace />} />
           <Route path="/instructors" element={<InstructorsPage />} />
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/register" element={<RegisterScreen />} />

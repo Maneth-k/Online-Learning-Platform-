@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useCourses } from '../../hooks/useCourses.js';
+import { CourseCard } from './CourseCard.js';
 import { Footer } from '../landing/Footer.js';
-import type { Course } from '../../types/course.js';
 import './CoursesPage.css';
 
 interface CoursesPageProps {
@@ -54,13 +54,6 @@ export function CoursesPage({
     return Array.from(set).sort();
   }, [allCourses]);
 
-  const getInstructorName = (instructor: Course['instructor']) => {
-    if (typeof instructor === 'object' && instructor !== null) {
-      return instructor.username || 'Instructor';
-    }
-    return typeof instructor === 'string' && instructor.trim() ? instructor : 'Instructor';
-  };
-
   const handleClearFilters = () => {
     setSearchInput('');
     setSearchQuery('');
@@ -73,10 +66,18 @@ export function CoursesPage({
         <div className="courses-page-container">
           {/* Header */}
           <div className="courses-page-header">
-            <h1 className="courses-page-title">Courses</h1>
-            <p className="courses-page-subtitle">
-              Browse all available courses in the academy.
-            </p>
+            <div>
+              <h1 className="courses-page-title">Courses</h1>
+              <p className="courses-page-subtitle">
+                Browse all available courses in the academy.
+              </p>
+            </div>
+            <Link to="/recommendations" className="courses-ai-advisor-link">
+              <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#2563eb' }}>
+                auto_awesome
+              </span>
+              <span>Need guidance? Ask AI Advisor</span>
+            </Link>
           </div>
 
           {/* Minimal Search & Filter Bar */}
@@ -164,41 +165,7 @@ export function CoursesPage({
           ) : (
             <div className="courses-grid">
               {courses.map((course) => (
-                <Link
-                  key={course._id}
-                  to={`/courses/${course._id}`}
-                  className="course-card"
-                >
-                  <div className="course-card-top">
-                    <span className="course-category-tag">
-                      {course.category || 'General'}
-                    </span>
-                    <span className="course-date">
-                      {course.createdAt
-                        ? new Date(course.createdAt).toLocaleDateString(undefined, {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })
-                        : ''}
-                    </span>
-                  </div>
-
-                  <h2 className="course-card-title">{course.title}</h2>
-
-                  <div className="course-instructor-text">
-                    By {getInstructorName(course.instructor)}
-                  </div>
-
-                  <p className="course-card-description">{course.description}</p>
-
-                  <div className="course-card-action-bar">
-                    <span>View Content & Enroll</span>
-                    <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
-                      arrow_forward
-                    </span>
-                  </div>
-                </Link>
+                <CourseCard key={course._id} course={course} />
               ))}
             </div>
           )}
