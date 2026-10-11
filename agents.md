@@ -24,6 +24,7 @@ Welcome to the LMS project. As your **Senior Tech Lead**, my role is to pair wit
 | **Frontend** | React 19 + TypeScript + Vite | Blazing fast HMR, strict type safety, zero legacy bundler overhead. |
 | **Styling** | Vanilla CSS Design System | High-performance CSS custom properties design tokens, accessible, zero extra CSS dependency bloat. |
 | **Backend** | Express 5 + TypeScript (ESM) | Native async route handlers in Express 5, strict ES modules (`"type": "module"`). |
+| **Testing** | Vitest + Supertest | Blazing fast ESM-native test runner, Jest-compatible API, integrated HTTP assertions with supertest. |
 | **Runtime & Dev Server** | `tsx` (`tsx watch`) & `node` | Modern TypeScript execution engine built on `esbuild`. Instant execution with zero transpilation boilerplate, replaces outdated `ts-node` + `nodemon` setups. |
 
 > **Tech Lead Note on Nodemon vs. `tsx`:**  
@@ -98,13 +99,22 @@ When continuing this assessment, execute the following steps in sequence:
 ### Phase 4: RESTful API Layer (Controller-Service Pattern)
 1. **Input Validation:** Use `zod` schema middleware on all route inputs (`req.body`, `req.params`, `req.query`).
 2. **Service Layer:** Keep controllers thin; place domain rules and DB queries inside `/services`.
-3. **Unified Response Format:**
-   ```json
-   {
-     "success": true,
-     "data": {},
-     "message": "Resource retrieved successfully"
+3. **Unified Response Format (`ActionResult<T>`):**
+   All API endpoints and controllers must type their responses using the standardized `ActionResult<T>` type (`server/src/types/actionResult.ts`):
+   ```typescript
+   export interface ActionResult<T = unknown> {
+     success: boolean;
+     message?: string;
+     data?: T;
+     error?: string;
    }
+   ```
+   Express handlers must type the response parameter as `res: Response<ActionResult<T>>` to ensure compile-time adherence:
+   ```typescript
+   export const getCourses = async (
+     req: Request,
+     res: Response<ActionResult<{ courses: ICourse[] }>>
+   ): Promise<void> => { ... };
    ```
 4. **Centralized Error Handling:** All errors routed to the global error middleware via custom `ApiError` class.
 
@@ -116,7 +126,10 @@ When continuing this assessment, execute the following steps in sequence:
 
 ### Phase 6: Quality Assurance & Production Polish
 1. **Type Check & Lint:** Ensure zero errors on `npm run build` in both `client` and `server`.
-2. **API Testing:** Automated integration tests with Vitest/Jest and Supertest.
+2. **API & Unit Testing:** Comprehensive test coverage for all use cases using Vitest and Supertest:
+   - **Test File Naming Convention:** All test files must follow `*.test.ts` (e.g. `user.test.ts`, `jwt.test.ts`, `auth.middleware.test.ts`, `auth.routes.test.ts`).
+   - **Coverage Standard:** Every domain model, controller endpoint, and security middleware must have dedicated test cases covering both happy paths and edge cases (400, 401, 403, 404, 409).
+   - **Isolation:** Fast, deterministic unit & HTTP integration tests without external network dependencies.
 3. **Documentation:** OpenAPI/Swagger or Postman collection.
 
 ---
@@ -138,6 +151,9 @@ npm run dev        # Run with live reload via tsx watch on http://localhost:5000
 npm run dev:nodemon# Alternative live reload via nodemon
 npm run build      # Compile TypeScript into JavaScript (dist/)
 npm run start      # Run production compiled server
+npm test           # Execute Vitest test suite once
+npm run test:watch # Run Vitest in interactive watch mode
+npm run test:coverage # Generate test coverage report
 ```
 
 ---
@@ -146,6 +162,9 @@ npm run start      # Run production compiled server
 - [ ] No `any` types in TypeScript (use `unknown` or specific interfaces).
 - [ ] No secrets or API keys hardcoded in code (all via `.env`).
 - [ ] Every API endpoint has input validation and handles edge cases (e.g., 400 Bad Request, 404 Not Found, 401/403 Auth).
+- [ ] Every use case has automated test coverage in a `*.test.ts` file (e.g., `user.test.ts`).
+- [ ] All tests pass via `npm test` before submitting code.
 - [ ] No unhandled promise rejections.
 - [ ] Frontend handles all 3 states: `Loading`, `Error`, and `Success/Empty`.
 - [ ] CSS adheres to the responsive design tokens in `index.css`.
+

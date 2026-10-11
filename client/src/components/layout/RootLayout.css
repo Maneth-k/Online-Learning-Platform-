@@ -1,0 +1,18 @@
+/* Global Layout Styles (Like Next.js layout.tsx) */
+
+.mentora-app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface, #f8f9ff);
+  color: var(--on-surface, #0b1c30);
+  font-family: var(--font-body, 'Inter', sans-serif);
+  position: relative;
+}
+
+.mentora-app-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}

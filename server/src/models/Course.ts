@@ -4,6 +4,7 @@ export interface ICourse {
   title: string;
   description: string;
   content: string;
+  category: string;
   instructor: Types.ObjectId;
   createdAt?: Date;
   updatedAt?: Date;
@@ -28,6 +29,11 @@ const courseSchema = new Schema<ICourseDocument>(
       type: String,
       required: [true, 'Course content is required'],
     },
+    category: {
+      type: String,
+      required: [true, 'Course category is required'],
+      trim: true,
+    },
     instructor: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -41,8 +47,10 @@ const courseSchema = new Schema<ICourseDocument>(
   }
 );
 
-// Index for efficient instructor course filtering
-courseSchema.index({ instructor: 1 });
+
+courseSchema.index({ category: 1, createdAt: -1 });
+// Text index for keyword candidate search (Step 2)
+courseSchema.index({ title: 'text', description: 'text' });
 
 export const Course: Model<ICourseDocument> = model<ICourseDocument>('Course', courseSchema);
 export default Course;

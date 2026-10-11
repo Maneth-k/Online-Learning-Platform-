@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { Schema, model, type Document, type Model } from 'mongoose';
 
 export type UserRole = 'student' | 'instructor';
@@ -10,7 +11,9 @@ export interface IUser {
   updatedAt?: Date;
 }
 
-export interface IUserDocument extends IUser, Document {}
+export interface IUserDocument extends IUser, Document {
+  comparePassword(candidate: string): Promise<boolean>;
+}
 
 const userSchema = new Schema<IUserDocument>(
   {
@@ -24,6 +27,7 @@ const userSchema = new Schema<IUserDocument>(
     password: {
       type: String,
       required: [true, 'Password is required'],
+      minlength: [6, 'Password must be at least 6 characters long'],
     },
     role: {
       type: String,
@@ -44,11 +48,30 @@ const userSchema = new Schema<IUserDocument>(
         return ret;
       },
     },
+    toObject: {
+      transform: (_doc, ret: Record<string, unknown>) => {
+        delete ret.password;
+        return ret;
+      },
+    },
   }
 );
 
-// Indexes
-userSchema.index({ username: 1 }, { unique: true });
+// Hash password before saving if modified
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) {
+    return;
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Compare password method for authentication
+userSchema.methods.comparePassword = async function (candidate: string): Promise<boolean> {
+  return bcrypt.compare(candidate, this.password);
+};
+
 
 export const User: Model<IUserDocument> = model<IUserDocument>('User', userSchema);
 export default User;
+

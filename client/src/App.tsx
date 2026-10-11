@@ -1,71 +1,45 @@
-import { useState, useEffect } from 'react';
-import './App.css';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { RootLayout } from './components/layout/RootLayout.js';
+import { LandingPage } from './components/landing/LandingPage.js';
+import { CoursesPage } from './components/course/CoursesPage.js';
+import { CourseDetailPage } from './components/course/CourseDetailPage.js';
+import { InstructorsPage } from './components/instructors/InstructorsPage.js';
+import { LoginScreen } from './components/auth/LoginScreen.js';
+import { RegisterScreen } from './components/auth/RegisterScreen.js';
+import { DashboardPage } from './components/dashboard/DashboardPage.js';
+import { CreateCourseScreen } from './components/course/CreateCourseScreen.js';
+import { RecommendationsPage } from './components/recommendations/RecommendationsPage.js';
+import { ProtectedRoute } from './components/layout/ProtectedRoute.js';
 
-interface ServerHealth {
-  status: string;
-  message: string;
-  timestamp: string;
-  env: string;
-}
-
-function App() {
-  const [serverHealth, setServerHealth] = useState<ServerHealth | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchHealth = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/health');
-        if (!response.ok) {
-          throw new Error(`Server responded with ${response.status}`);
-        }
-        const data = await response.json();
-        setServerHealth(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to connect to backend');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchHealth();
-  }, []);
-
+export function App() {
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <h1>Learning Management System (LMS)</h1>
-        <p className="subtitle">Enterprise Full-Stack Architecture (React + Express + TypeScript)</p>
-      </header>
-
-      <main className="dashboard-preview">
-        <section className="status-card">
-          <h2>System Initialization Status</h2>
-          <div className="status-grid">
-            <div className="status-item ready">
-              <span className="badge">Active</span>
-              <h3>Frontend Client</h3>
-              <p>React 19 + TypeScript + Vite</p>
-            </div>
-
-            <div className={`status-item ${serverHealth ? 'ready' : loading ? 'pending' : 'error'}`}>
-              <span className="badge">{serverHealth ? 'Connected' : loading ? 'Connecting...' : 'Disconnected'}</span>
-              <h3>Backend API</h3>
-              <p>Express 5 + TypeScript + TSX</p>
-              {serverHealth && (
-                <div className="health-details">
-                  <small>Status: {serverHealth.status}</small>
-                  <br />
-                  <small>Env: {serverHealth.env}</small>
-                </div>
-              )}
-              {error && <small className="error-text">Ensure server is running on port 5000: {error}</small>}
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<RootLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:id" element={<CourseDetailPage />} />
+          <Route path="/course/:id" element={<CourseDetailPage />} />
+          <Route
+            path="/recommendations"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <RecommendationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/ai-advisor" element={<Navigate to="/recommendations" replace />} />
+          <Route path="/instructors" element={<InstructorsPage />} />
+          <Route path="/login" element={<LoginScreen />} />
+          <Route path="/register" element={<RegisterScreen />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/create-course" element={<CreateCourseScreen />} />
+          {/* Aliases & Fallbacks */}
+          <Route path="/course" element={<Navigate to="/courses" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

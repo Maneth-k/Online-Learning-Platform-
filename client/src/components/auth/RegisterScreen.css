@@ -1,0 +1,407 @@
+.register-page-wrapper {
+  min-height: 100vh;
+  padding-top: 88px;
+  background-color: var(--surface);
+  color: var(--on-surface);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body);
+}
+
+.register-main-container {
+  flex: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 1024px) {
+  .register-main-container {
+    padding: 2.5rem;
+  }
+}
+
+.register-card-split {
+  width: 100%;
+  max-width: 560px;
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 16px 40px rgba(0, 35, 111, 0.08);
+  border: 1px solid rgba(229, 238, 255, 0.9);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Left Column: Register Form */
+.register-form-panel {
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media (min-width: 640px) {
+  .register-form-panel {
+    padding: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .register-form-panel {
+    padding: 3rem;
+  }
+}
+
+.register-form-center {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mobile Top Cohort Bar */
+.mobile-cohort-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  margin-bottom: 0.85rem;
+  font-size: 0.825rem;
+}
+
+@media (min-width: 1024px) {
+  .mobile-cohort-bar {
+    display: none;
+  }
+}
+
+.cohort-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--on-surface-variant);
+  font-weight: 500;
+}
+
+.cohort-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--secondary);
+  animation: pulse 1.8s infinite;
+}
+
+/* Password Strength Indicator */
+.password-strength-bar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.strength-step {
+  height: 4px;
+  flex: 1;
+  border-radius: var(--radius-full);
+  background: var(--surface-container-high);
+  transition: background-color 0.25s ease;
+}
+
+.strength-step.filled {
+  background: var(--secondary);
+}
+
+.password-rules-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--on-surface-variant);
+  margin-top: 0.35rem;
+}
+
+.rule-check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rule-check-item.valid {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+/* Learning Track Chips */
+.track-chips-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.track-chip-btn {
+  padding: 0.55rem 0.4rem;
+  border-radius: var(--radius-md);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+  background: var(--surface-container-low);
+  color: var(--on-surface-variant);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.track-chip-btn:hover {
+  background: var(--surface-container);
+  color: var(--on-surface);
+}
+
+.track-chip-btn.active {
+  background: var(--primary-fixed);
+  color: var(--on-primary-fixed);
+  border-color: rgba(0, 35, 111, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 35, 111, 0.1);
+}
+
+/* Right Column: Register Showcase */
+.register-showcase-panel {
+  display: none;
+  background: linear-gradient(135deg, var(--surface-container-high) 0%, var(--surface-container) 50%, var(--surface-dim) 100%);
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media (min-width: 1024px) {
+  .register-showcase-panel {
+    display: flex;
+  }
+}
+
+.floating-tutor-card {
+  width: 90%;
+  margin-top: -2.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-xl);
+  padding: 0.75rem 1rem;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 10;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.tutor-bolt-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--primary-fixed);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-social-proof-card {
+  width: 85%;
+  margin-top: 0.5rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-xl);
+  padding: 0.65rem 1rem;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 5;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.avatar-stack-group {
+  display: flex;
+  margin-right: 0.5rem;
+}
+
+.avatar-stack-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  margin-left: -6px;
+}
+
+.avatar-stack-circle:first-child {
+  margin-left: 0;
+}
+
+.showcase-quote-box {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.showcase-quote-text {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--on-surface);
+  line-height: 1.45;
+}
+
+/* Mobile Mentora Guarantee Pill Strip */
+.mobile-guarantee-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: var(--on-surface-variant);
+}
+
+@media (min-width: 1024px) {
+  .mobile-guarantee-strip {
+    display: none;
+  }
+}
+
+.guarantee-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.guarantee-divider {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--outline-variant);
+}
+
+/* Role Selector (Student vs Instructor) */
+.role-selector-container {
+  margin-bottom: 1.25rem;
+}
+
+.role-selector-label {
+  font-size: 0.825rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--on-surface-variant);
+  margin-bottom: 0.5rem;
+}
+
+.role-selector-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.role-card-btn {
+  background: var(--surface-container-low);
+  border: 2px solid var(--outline-light);
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.role-card-btn:hover {
+  background: var(--surface-container);
+  border-color: var(--secondary-fixed-dim);
+}
+
+.role-card-btn.active {
+  background: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 4px 14px rgba(0, 35, 111, 0.12);
+}
+
+.role-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.role-card-header .role-icon {
+  font-size: 22px;
+  color: var(--primary);
+}
+
+.role-card-btn.active .role-card-header .role-icon {
+  color: var(--secondary);
+}
+
+.role-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-full);
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+}
+
+.role-card-btn.active .role-badge {
+  background: var(--secondary-fixed);
+  color: var(--primary);
+}
+
+.role-card-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 0.2rem;
+}
+
+.role-card-desc {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+
+/* Auth Error Alert */
+.auth-error-alert {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}

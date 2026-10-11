@@ -1,5 +1,6 @@
 import express, { type Application, type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import {
   connectDB,
@@ -7,8 +8,12 @@ import {
   checkDatabaseHealth,
   type DatabaseHealth,
 } from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
+import courseRoutes from './routes/courseRoutes.js';
+import enrollmentRoutes from './routes/enrollmentRoutes.js';
+import instructorRoutes from './routes/instructorRoutes.js';
 
-dotenv.config();
+dotenv.config({ override: true });
 
 const app: Application = express();
 const PORT: number = Number(process.env.PORT) || 5000;
@@ -21,6 +26,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -32,7 +38,19 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
+app.use('/api/instructors', instructorRoutes);
+
+// Planned v1 AI recommendation route alias
+import { getCourseRecommendationsHandler } from './controllers/recommendationController.js';
+import { optionalAuthenticate } from './middleware/auth.js';
+app.post('/api/v1/ai/recommendations', optionalAuthenticate, getCourseRecommendationsHandler);
+
 // Health check endpoint
+
 interface HealthResponse {
   status: 'ok' | 'degraded';
   message: string;
