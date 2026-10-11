@@ -1,7 +1,8 @@
 import type { ActionResult } from '../types/auth.js';
 import type { Course, CreateCourseInput, CourseQueryFilters } from '../types/course.js';
+import { API_ROOT } from './apiConfig.js';
 
-const API_BASE = '/api/courses';
+const API_BASE = `${API_ROOT}/api/courses`;
 
 /**
  * Create a new course (Instructor only).

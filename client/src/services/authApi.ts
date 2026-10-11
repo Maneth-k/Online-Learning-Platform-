@@ -1,6 +1,7 @@
 import type { ActionResult, LoginInput, RegisterInput, User } from '../types/auth.js';
+import { API_ROOT } from './apiConfig.js';
 
-const API_BASE = '/api/auth';
+const API_BASE = `${API_ROOT}/api/auth`;
 
 /**
  * Fetch the currently authenticated user session via HTTP-only cookie.

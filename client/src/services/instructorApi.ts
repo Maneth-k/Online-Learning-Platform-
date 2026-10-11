@@ -1,7 +1,8 @@
 import type { ActionResult } from '../types/auth.js';
 import type { Instructor, InstructorFilters, InstructorPagination } from '../types/instructor.js';
+import { API_ROOT } from './apiConfig.js';
 
-const API_BASE = '/api/instructors';
+const API_BASE = `${API_ROOT}/api/instructors`;
 
 function formatUsernameToName(username: string): string {
   if (!username) return 'Instructor';
