@@ -85,6 +85,49 @@ export async function fetchCourseById(id: string): Promise<Course> {
   return result.data.course;
 }
 
+/**
+ * Update an existing course (Instructor only).
+ * PUT /api/courses/:id
+ */
+export async function updateCourse(
+  id: string,
+  input: Partial<CreateCourseInput>
+): Promise<Course> {
+  const response = await fetch(`${API_BASE}/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(input),
+  });
+
+  const result: ActionResult<{ course: Course }> = await response.json();
+
+  if (!response.ok || !result.success || !result.data?.course) {
+    throw new Error(result.message || 'Failed to update course');
+  }
+
+  return result.data.course;
+}
+
+/**
+ * Delete an existing course (Instructor only).
+ * DELETE /api/courses/:id
+ */
+export async function deleteCourse(id: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+
+  const result: ActionResult = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || 'Failed to delete course');
+  }
+}
+
 export type RecommendationSource = 'ai' | 'fallback' | 'empty';
 export type FallbackReason = 'budget_exhausted' | 'openai_error' | 'timeout' | 'other';
 

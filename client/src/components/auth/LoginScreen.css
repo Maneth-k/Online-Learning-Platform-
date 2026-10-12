@@ -459,18 +459,6 @@
   cursor: pointer;
 }
 
-.btn-forgot-password {
-  font-size: 0.825rem;
-  font-weight: 600;
-  color: var(--secondary);
-  transition: color 0.2s ease;
-}
-
-.btn-forgot-password:hover {
-  text-decoration: underline;
-  color: var(--primary);
-}
-
 .btn-auth-submit {
   width: 100%;
   height: 48px;

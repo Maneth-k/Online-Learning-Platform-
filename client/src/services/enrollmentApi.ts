@@ -1,5 +1,10 @@
 import type { ActionResult } from '../types/auth.js';
-import type { Enrollment, CheckEnrollmentResponse } from '../types/enrollment.js';
+import type {
+  Enrollment,
+  CheckEnrollmentResponse,
+  CourseStudentsResponse,
+  EnrollmentStatus,
+} from '../types/enrollment.js';
 import { API_ROOT } from './apiConfig.js';
 
 const API_BASE = `${API_ROOT}/api/enrollments`;
@@ -86,4 +91,62 @@ export async function unenrollCourse(enrollmentId: string): Promise<void> {
   if (!response.ok || !result.success) {
     throw new Error(result.message || 'Failed to unenroll from course');
   }
+}
+
+/**
+ * Get all students enrolled in a specific course (Instructor only).
+ * GET /api/enrollments/course/:courseId
+ */
+export async function fetchCourseStudents(
+  courseId: string,
+  options?: { page?: number; limit?: number; status?: string }
+): Promise<CourseStudentsResponse> {
+  const searchParams = new URLSearchParams();
+  if (options?.page) searchParams.set('page', String(options.page));
+  if (options?.limit) searchParams.set('limit', String(options.limit));
+  if (options?.status && options.status !== 'all') {
+    searchParams.set('status', options.status);
+  }
+
+  const query = searchParams.toString();
+  const url = query ? `${API_BASE}/course/${courseId}?${query}` : `${API_BASE}/course/${courseId}`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  const result: ActionResult<CourseStudentsResponse> = await response.json();
+
+  if (!response.ok || !result.success || !result.data) {
+    throw new Error(result.message || 'Failed to fetch enrolled students');
+  }
+
+  return result.data;
+}
+
+/**
+ * Update an enrollment's status (Instructor or student).
+ * PATCH /api/enrollments/:id/status
+ */
+export async function updateEnrollmentStatusApi(
+  enrollmentId: string,
+  status: EnrollmentStatus
+): Promise<Enrollment> {
+  const response = await fetch(`${API_BASE}/${enrollmentId}/status`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ status }),
+  });
+
+  const result: ActionResult<{ enrollment: Enrollment }> = await response.json();
+
+  if (!response.ok || !result.success || !result.data?.enrollment) {
+    throw new Error(result.message || 'Failed to update enrollment status');
+  }
+
+  return result.data.enrollment;
 }

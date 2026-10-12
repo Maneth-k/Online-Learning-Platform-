@@ -1,23 +1,40 @@
-import { useState, type FormEvent } from 'react';
-import { useCreateCourse } from '../hooks/useCourses.js';
+import { useState, useEffect, type FormEvent } from 'react';
+import { useCreateCourse, useUpdateCourse } from '../hooks/useCourses.js';
 import { createCourseSchema } from '../schemas/courseSchemas.js';
 import type { Course } from '../types/course.js';
 import './course/CreateCourseScreen.css';
 
-export interface AddCourseFormProps {
+export interface CourseFormProps {
+  course?: Course;
   onSuccess?: (course: Course) => void;
   onCancel?: () => void;
 }
 
-export function AddCourseForm({ onSuccess, onCancel }: AddCourseFormProps) {
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
-  const [description, setDescription] = useState('');
-  const [content, setContent] = useState('');
+export type AddCourseFormProps = CourseFormProps;
+
+export function AddCourseForm({ course, onSuccess, onCancel }: CourseFormProps) {
+  const isEditing = Boolean(course);
+
+  const [title, setTitle] = useState(course?.title || '');
+  const [category, setCategory] = useState(course?.category || '');
+  const [description, setDescription] = useState(course?.description || '');
+  const [content, setContent] = useState(course?.content || '');
+
+  useEffect(() => {
+    if (course) {
+      setTitle(course.title || '');
+      setCategory(course.category || '');
+      setDescription(course.description || '');
+      setContent(course.content || '');
+    }
+  }, [course]);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const createCourseMutation = useCreateCourse();
+  const updateCourseMutation = useUpdateCourse();
+
+  const isPending = createCourseMutation.isPending || updateCourseMutation.isPending;
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -38,9 +55,21 @@ export function AddCourseForm({ onSuccess, onCancel }: AddCourseFormProps) {
       return;
     }
 
-    createCourseMutation.mutate(
-      parseResult.data,
-      {
+    if (isEditing && course?._id) {
+      updateCourseMutation.mutate(
+        { id: course._id, input: parseResult.data },
+        {
+          onSuccess: (updated) => {
+            showToast('Course updated successfully!');
+            onSuccess?.(updated);
+          },
+          onError: (err) => {
+            showToast(err instanceof Error ? err.message : 'Failed to update course');
+          },
+        }
+      );
+    } else {
+      createCourseMutation.mutate(parseResult.data, {
         onSuccess: (newCourse) => {
           showToast('Course module published successfully!');
           onSuccess?.(newCourse);
@@ -48,18 +77,21 @@ export function AddCourseForm({ onSuccess, onCancel }: AddCourseFormProps) {
         onError: (err) => {
           showToast(err instanceof Error ? err.message : 'Failed to publish course');
         },
-      }
-    );
+      });
+    }
   };
-
 
   return (
     <div className="course-studio-container" style={{ margin: '0 auto' }}>
       {/* Top Action Header */}
       <div className="studio-title-row">
         <div className="studio-title-group">
-          <h1>Create Course Content</h1>
-          <p>Fill in the details below to publish your course content.</p>
+          <h1>{isEditing ? 'Edit Course Content' : 'Create Course Content'}</h1>
+          <p>
+            {isEditing
+              ? 'Update the course syllabus and details below.'
+              : 'Fill in the details below to publish your course content.'}
+          </p>
         </div>
       </div>
 
@@ -133,13 +165,14 @@ export function AddCourseForm({ onSuccess, onCancel }: AddCourseFormProps) {
           />
         </div>
 
-        {/* Footer */}
+        {/* Footer Actions */}
         <div className="form-card-footer">
           {onCancel && (
             <button
               type="button"
               className="btn-form-cancel"
               onClick={onCancel}
+              disabled={isPending}
             >
               Cancel
             </button>
@@ -147,9 +180,15 @@ export function AddCourseForm({ onSuccess, onCancel }: AddCourseFormProps) {
           <button
             type="submit"
             className="btn-form-submit"
-            disabled={createCourseMutation.isPending}
+            disabled={isPending}
           >
-            {createCourseMutation.isPending ? 'Publishing...' : 'Save'}
+            {isPending
+              ? isEditing
+                ? 'Updating...'
+                : 'Publishing...'
+              : isEditing
+              ? 'Save Changes'
+              : 'Publish Course'}
           </button>
         </div>
       </form>
@@ -170,5 +209,6 @@ export function AddCourseForm({ onSuccess, onCancel }: AddCourseFormProps) {
   );
 }
 
+export const CourseForm = AddCourseForm;
 export const CreateCourseForm = AddCourseForm;
 export default AddCourseForm;

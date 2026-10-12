@@ -1,0 +1,435 @@
+/* Enrolled Scholars Component Styles */
+
+.course-students-section {
+  background: var(--surface-container-lowest, #ffffff);
+  border: 1px solid var(--outline-light, #e2e8f0);
+  border-radius: var(--radius-xl, 14px);
+  padding: 2rem;
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+}
+
+.course-students-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--outline-light, #f1f5f9);
+  flex-wrap: wrap;
+}
+
+.students-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.students-title-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background-color: var(--surface-container-low, #eff4ff);
+  color: var(--primary, #00236f);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.students-section-title {
+  font-family: var(--font-display, 'Inter', sans-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--primary, #00236f);
+  margin: 0 0 0.2rem 0;
+}
+
+.students-section-subtitle {
+  font-size: 0.875rem;
+  color: var(--on-surface-variant, #64748b);
+  margin: 0;
+}
+
+.students-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-full, 999px);
+  background-color: var(--surface-container-low, #eff4ff);
+  border: 1px solid #cce5ff;
+}
+
+.count-number {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--primary, #00236f);
+}
+
+.count-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary, #00236f);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Filter Toolbar */
+.students-filter-toolbar {
+  margin: 1.25rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.filter-pills-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.filter-pill-btn {
+  padding: 0.45rem 0.95rem;
+  min-height: 38px;
+  border-radius: var(--radius-full, 999px);
+  background-color: transparent;
+  color: var(--on-surface-variant, #64748b);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+}
+
+.filter-pill-btn:hover {
+  background-color: var(--surface-container-low, #eff4ff);
+  color: var(--primary, #00236f);
+}
+
+.filter-pill-btn.active {
+  background-color: var(--primary, #00236f);
+  color: #ffffff;
+  border-color: var(--primary, #00236f);
+  box-shadow: 0 2px 6px rgba(0, 35, 111, 0.2);
+}
+
+/* Toast */
+.students-status-toast {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.6rem 1rem;
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* State Boxes */
+.students-state-box {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  border-radius: 12px;
+}
+
+.students-state-box.loading {
+  color: var(--secondary, #006398);
+}
+
+.spinner-icon {
+  font-size: 36px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 0.75rem;
+}
+
+.students-state-box.error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+}
+
+.error-icon {
+  font-size: 36px;
+  margin-bottom: 0.75rem;
+}
+
+.students-state-box.empty {
+  background-color: #f8fafc;
+  border: 1px dashed #cbd5e1;
+}
+
+.empty-avatar-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem auto;
+}
+
+.students-state-box.empty h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--on-surface, #0b1c30);
+  margin: 0 0 0.35rem 0;
+}
+
+.students-state-box.empty p {
+  font-size: 0.9rem;
+  color: var(--on-surface-variant, #64748b);
+  margin: 0;
+}
+
+/* Table */
+.students-table-container {
+  overflow-x: auto;
+  border: 1px solid var(--outline-light, #e2e8f0);
+  border-radius: 10px;
+}
+
+.students-roster-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.students-roster-table th {
+  background-color: var(--surface-container-low, #f8fafc);
+  padding: 0.85rem 1rem;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--on-surface-variant, #64748b);
+  border-bottom: 1px solid var(--outline-light, #e2e8f0);
+}
+
+.students-roster-table td {
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.student-roster-row:hover {
+  background-color: #f8fbff;
+}
+
+.student-roster-row:last-child td {
+  border-bottom: none;
+}
+
+/* Scholar Identity */
+.scholar-identity-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.scholar-avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #0284c7);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.scholar-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.scholar-username {
+  font-weight: 700;
+  color: var(--on-surface, #0b1c30);
+  font-size: 0.925rem;
+}
+
+.scholar-role-tag {
+  font-size: 0.75rem;
+  color: var(--on-surface-variant, #64748b);
+}
+
+/* Date */
+.scholar-date-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--on-surface-variant, #475569);
+  font-size: 0.85rem;
+}
+
+/* Status Badges */
+.roster-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full, 999px);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.roster-status-badge .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.roster-status-badge.enrolled {
+  background-color: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.roster-status-badge.enrolled .status-dot {
+  background-color: #10b981;
+}
+
+.roster-status-badge.completed {
+  background-color: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.roster-status-badge.completed .status-dot {
+  background-color: #0ea5e9;
+}
+
+.roster-status-badge.dropped {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.roster-status-badge.dropped .status-dot {
+  background-color: #9ca3af;
+}
+
+/* Status Select */
+.roster-action-wrap {
+  display: inline-flex;
+  justify-content: flex-end;
+}
+
+.roster-status-select {
+  padding: 0.4rem 0.75rem;
+  min-height: 36px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #1e293b;
+  font-size: 0.825rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+  touch-action: manipulation;
+}
+
+.roster-status-select:hover:not(:disabled) {
+  border-color: var(--primary, #00236f);
+}
+
+.roster-status-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Pagination */
+.students-pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  background-color: var(--surface-container-low, #f8fafc);
+  border-top: 1px solid var(--outline-light, #e2e8f0);
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pagination-info {
+  color: var(--on-surface-variant, #64748b);
+}
+
+.pagination-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.4rem 0.75rem;
+  min-height: 36px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: var(--primary, #00236f);
+  font-weight: 600;
+  font-size: 0.825rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+}
+
+.btn-pagination:hover:not(:disabled) {
+  background-color: var(--surface-container-low, #eff4ff);
+  border-color: #bfdbfe;
+}
+
+.btn-pagination:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 680px) {
+  .course-students-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .course-students-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-pills-group {
+    width: 100%;
+  }
+
+  .filter-pill-btn {
+    flex: 1 1 calc(50% - 0.4rem);
+    text-align: center;
+    min-height: 44px;
+  }
+
+  .roster-status-select {
+    min-height: 44px;
+  }
+
+  .btn-pagination {
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+  }
+}

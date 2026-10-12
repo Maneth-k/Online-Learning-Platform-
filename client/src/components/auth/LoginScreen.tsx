@@ -123,24 +123,9 @@ export function LoginScreen({
                 </div>
 
                 <div className="form-field-group">
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <label className="form-label" htmlFor="login-password">
-                      Password
-                    </label>
-                    <button
-                      type="button"
-                      className="btn-forgot-password"
-                      onClick={() => alert('Password reset link will be sent to your email.')}
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
+                  <label className="form-label" htmlFor="login-password">
+                    Password
+                  </label>
                   <div className="form-input-container">
                     <span
                       className="material-symbols-outlined input-leading-icon"

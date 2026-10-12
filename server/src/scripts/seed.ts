@@ -112,7 +112,7 @@ Module 2: Performance & Indexing
 ];
 
 async function seed(): Promise<void> {
-  console.log('🌱 Starting database seed script...');
+  console.log('Starting database seed script...');
 
   try {
     await connectDB();
@@ -130,7 +130,7 @@ async function seed(): Promise<void> {
           password: defaultPassword,
           role: 'instructor',
         });
-        console.log(`✅ Created instructor: "${instData.username}"`);
+        console.log(`[Created] Instructor: "${instData.username}"`);
         createdInstructorCount++;
       } else {
         if (instructor.role !== 'instructor') {
@@ -153,20 +153,20 @@ async function seed(): Promise<void> {
             category: courseData.category,
             instructor: instructor._id,
           });
-          console.log(`  └─ ✅ Seeded course: "${courseData.title}" [${courseData.category}]`);
+          console.log(`  └─ [Seeded] Course: "${courseData.title}" [${courseData.category}]`);
           createdCourseCount++;
         }
       }
     }
 
     console.log('\n========================================');
-    console.log('🎉 Database seeding completed successfully!');
+    console.log('Database seeding completed successfully!');
     console.log(`Total New Instructors: ${createdInstructorCount}`);
     console.log(`Total New Courses:     ${createdCourseCount}`);
     console.log('Default Password for all seeded instructors: Instructor123!');
     console.log('========================================\n');
   } catch (error) {
-    console.error('❌ Seeding error:', error);
+    console.error('Seeding error:', error);
     process.exitCode = 1;
   } finally {
     await disconnectDB();
