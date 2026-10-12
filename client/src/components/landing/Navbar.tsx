@@ -5,7 +5,7 @@ import './Navbar.css';
 
 interface NavbarProps {
   onOpenAuth?: (mode?: 'login' | 'register') => void;
-  currentUser?: { username: string; role: string } | null;
+  currentUser?: { email?: string; username?: string; role: string } | null;
   onLogout?: () => void;
   onOpenDashboard?: () => void;
   onOpenCreateCourse?: () => void;
@@ -130,11 +130,16 @@ export function Navbar({
         <div className="navbar-actions">
           {currentUser ? (
             <div className="user-profile-badge">
-              <div className="user-avatar-mini" title={currentUser.username}>
-                {currentUser.username.charAt(0).toUpperCase()}
+              <div
+                className="user-avatar-mini"
+                title={currentUser.email || currentUser.username || 'User'}
+              >
+                {(currentUser.email || currentUser.username || 'U').charAt(0).toUpperCase()}
               </div>
               <div>
-                <span className="user-info-text">{currentUser.username}</span>
+                <span className="user-info-text">
+                  {currentUser.email || currentUser.username}
+                </span>
                 <span className="user-role-tag">{currentUser.role}</span>
               </div>
               {onOpenDashboard ? (

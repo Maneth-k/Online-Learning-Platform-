@@ -66,7 +66,7 @@ export function CourseCard({
 
   const getInstructorName = (instructor: Course['instructor']) => {
     if (typeof instructor === 'object' && instructor !== null) {
-      return instructor.username || 'Instructor';
+      return (instructor as any).email || (instructor as any).username || 'Instructor';
     }
     return typeof instructor === 'string' && instructor.trim() ? instructor : 'Instructor';
   };

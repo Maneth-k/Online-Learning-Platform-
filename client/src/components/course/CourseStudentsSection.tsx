@@ -27,7 +27,7 @@ export function CourseStudentsSection({ courseId, courseTitle }: CourseStudentsS
 
   const getStudentName = (student: CourseEnrollmentItem['student']) => {
     if (typeof student === 'object' && student !== null) {
-      return student.username || 'Student';
+      return (student as any).email || (student as any).username || 'Student';
     }
     return typeof student === 'string' && student.trim() ? student : 'Student';
   };

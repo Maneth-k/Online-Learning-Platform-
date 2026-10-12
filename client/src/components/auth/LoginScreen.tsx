@@ -39,9 +39,9 @@ export function LoginScreen({
     e.preventDefault();
     setErrorMsg(null);
 
-    const cleanUsername = email.trim();
-    if (!cleanUsername) {
-      setErrorMsg('Email or username is required');
+    const cleanEmail = email.trim();
+    if (!cleanEmail) {
+      setErrorMsg('Email address is required');
       return;
     }
     if (!password) {
@@ -50,7 +50,7 @@ export function LoginScreen({
     }
 
     loginMutation.mutate(
-      { username: cleanUsername, password },
+      { email: cleanEmail, password },
       {
         onSuccess: (user) => {
           if (onSuccess) {
@@ -111,13 +111,13 @@ export function LoginScreen({
                     </span>
                     <input
                       id="login-email"
-                      type="text"
+                      type="email"
                       required
                       placeholder="name@example.com"
                       className="form-input-control"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      autoComplete="username"
+                      autoComplete="email"
                     />
                   </div>
                 </div>

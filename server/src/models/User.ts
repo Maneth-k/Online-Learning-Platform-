@@ -4,7 +4,8 @@ import { Schema, model, type Document, type Model } from 'mongoose';
 export type UserRole = 'student' | 'instructor';
 
 export interface IUser {
-  username: string;
+  email: string;
+  username?: string;
   password: string;
   role: UserRole;
   createdAt?: Date;
@@ -17,10 +18,17 @@ export interface IUserDocument extends IUser, Document {
 
 const userSchema = new Schema<IUserDocument>(
   {
+    email: {
+      type: String,
+      required: [true, 'Email is required'],
+      unique: true,
+      trim: true,
+      lowercase: true,
+      match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'],
+    },
     username: {
       type: String,
       required: [true, 'Username is required'],
-      unique: true,
       trim: true,
       minlength: [3, 'Username must be at least 3 characters long'],
     },
@@ -45,17 +53,41 @@ const userSchema = new Schema<IUserDocument>(
     toJSON: {
       transform: (_doc, ret: Record<string, unknown>) => {
         delete ret.password;
+        if (!ret.email && ret.username) {
+          ret.email = ret.username;
+        }
+        if (!ret.username && ret.email) {
+          ret.username = ret.email;
+        }
         return ret;
       },
     },
     toObject: {
       transform: (_doc, ret: Record<string, unknown>) => {
         delete ret.password;
+        if (!ret.email && ret.username) {
+          ret.email = ret.username;
+        }
+        if (!ret.username && ret.email) {
+          ret.username = ret.email;
+        }
         return ret;
       },
     },
   }
 );
+
+// Fallback pre-validation hook to ensure email and username are synchronized
+userSchema.pre('validate', function () {
+  if (!this.email && this.username) {
+    this.email = this.username.includes('@')
+      ? this.username.toLowerCase()
+      : `${this.username.toLowerCase()}@mentora.edu`;
+  }
+  if (!this.username && this.email) {
+    this.username = this.email;
+  }
+});
 
 // Hash password before saving if modified
 userSchema.pre('save', async function () {

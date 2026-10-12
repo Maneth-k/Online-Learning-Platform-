@@ -34,7 +34,11 @@ export async function loginUser(input: LoginInput): Promise<User> {
       'Content-Type': 'application/json',
     },
     credentials: 'include',
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      email: input.email || input.username,
+      username: input.username || input.email,
+      password: input.password,
+    }),
   });
 
   const result: ActionResult<{ user: User }> = await response.json();
@@ -57,7 +61,8 @@ export async function registerUser(input: RegisterInput): Promise<User> {
     },
     credentials: 'include',
     body: JSON.stringify({
-      username: input.username,
+      email: input.email,
+      username: input.username || input.email,
       password: input.password,
       role: input.role || 'student',
     }),

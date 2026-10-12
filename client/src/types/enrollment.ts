@@ -20,7 +20,8 @@ export interface CheckEnrollmentResponse {
 
 export interface EnrolledStudentInfo {
   _id: string;
-  username: string;
+  email?: string;
+  username?: string;
   role: string;
   createdAt?: string;
 }

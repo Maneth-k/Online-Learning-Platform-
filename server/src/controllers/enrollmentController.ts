@@ -78,7 +78,7 @@ export const enrollStudent = async (
 
     const populatedEnrollment = await Enrollment.findById(enrollment._id)
       .populate('course', 'title description category')
-      .populate('student', 'username');
+      .populate('student', 'email username');
 
     res.status(201).json({
       success: true,
@@ -261,7 +261,7 @@ export const getCourseStudents = async (
 
     const [enrollments, totalEnrollments] = await Promise.all([
       Enrollment.find(filter)
-        .populate('student', 'username role createdAt')
+        .populate('student', 'email username role createdAt')
         .sort({ enrollmentDate: -1 })
         .skip(offset)
         .limit(limit),

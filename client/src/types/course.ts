@@ -4,7 +4,7 @@ export interface Course {
   description: string;
   content: string;
   category?: string;
-  instructor: string | { _id: string; username: string };
+  instructor: string | { _id: string; email?: string; username?: string };
   createdAt?: string;
   updatedAt?: string;
 }
