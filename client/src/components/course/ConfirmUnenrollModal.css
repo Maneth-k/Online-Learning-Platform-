@@ -1,0 +1,166 @@
+.confirm-unenroll-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: confirmUnenrollFadeIn 0.2s ease-out;
+}
+
+@keyframes confirmUnenrollFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.confirm-unenroll-card {
+  background: #ffffff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  padding: 1.75rem;
+  text-align: center;
+  animation: confirmUnenrollScaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+@keyframes confirmUnenrollScaleUp {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.confirm-unenroll-icon-badge {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1.25rem auto;
+  border-radius: 50%;
+  background: #fff7ed;
+  color: #ea580c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid #ffedd5;
+}
+
+.confirm-unenroll-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.confirm-unenroll-desc {
+  margin: 0 0 1.5rem 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.confirm-unenroll-course-name {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.confirm-unenroll-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.btn-confirm-unenroll-cancel {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1rem;
+  min-height: 44px;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+}
+
+.btn-confirm-unenroll-cancel:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #1e293b;
+  border-color: #94a3b8;
+}
+
+.btn-confirm-unenroll-submit {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1rem;
+  min-height: 44px;
+  background: #ea580c;
+  color: #ffffff;
+  border: 1px solid #c2410c;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(234, 88, 12, 0.25);
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+}
+
+.btn-confirm-unenroll-submit:hover:not(:disabled) {
+  background: #c2410c;
+  border-color: #9a3412;
+  transform: translateY(-1px);
+}
+
+.btn-confirm-unenroll-submit:disabled,
+.btn-confirm-unenroll-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.unenroll-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: unenrollSpin 0.7s linear infinite;
+}
+
+@keyframes unenrollSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .confirm-unenroll-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-confirm-unenroll-cancel,
+  .btn-confirm-unenroll-submit {
+    width: 100%;
+  }
+}

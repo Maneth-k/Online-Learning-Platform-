@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCourse, useDeleteCourse } from '../../hooks/useCourses.js';
 import { useCurrentUser } from '../../hooks/useAuth.js';
-import { useCheckEnrollment, useEnrollCourse } from '../../hooks/useEnrollment.js';
+import { useCheckEnrollment, useEnrollCourse, useUnenrollCourse } from '../../hooks/useEnrollment.js';
 import { AddCourseForm } from '../AddCourseForm.js';
 import { CourseStudentsSection } from './CourseStudentsSection.js';
+import { ConfirmUnenrollModal } from './ConfirmUnenrollModal.js';
 import { Footer } from '../landing/Footer.js';
 import type { Course } from '../../types/course.js';
 import './CourseDetailPage.css';
@@ -57,7 +58,10 @@ export function CourseDetailPage() {
   const existingEnrollment = enrollmentCheck?.enrollment;
 
   const enrollMutation = useEnrollCourse();
+  const unenrollMutation = useUnenrollCourse();
   const [enrollSuccessMessage, setEnrollSuccessMessage] = useState<string | null>(null);
+  const [showUnenrollModal, setShowUnenrollModal] = useState(false);
+  const [unenrollError, setUnenrollError] = useState<string | null>(null);
 
   const getInstructorName = (instructor: Course['instructor']) => {
     if (typeof instructor === 'object' && instructor !== null) {
@@ -69,10 +73,29 @@ export function CourseDetailPage() {
   const handleEnroll = () => {
     if (!id) return;
     setEnrollSuccessMessage(null);
+    setUnenrollError(null);
 
     enrollMutation.mutate(id, {
       onSuccess: () => {
         setEnrollSuccessMessage('You have successfully enrolled in this course!');
+      },
+    });
+  };
+
+  const handleUnenroll = () => {
+    const targetEnrollmentId = existingEnrollment?._id || id;
+    if (!targetEnrollmentId) return;
+    setEnrollSuccessMessage(null);
+    setUnenrollError(null);
+
+    unenrollMutation.mutate(targetEnrollmentId, {
+      onSuccess: () => {
+        setShowUnenrollModal(false);
+        setEnrollSuccessMessage('You have successfully unenrolled from this course.');
+      },
+      onError: (err: any) => {
+        setUnenrollError(err?.message || 'Failed to unenroll from course');
+        setShowUnenrollModal(false);
       },
     });
   };
@@ -140,7 +163,7 @@ export function CourseDetailPage() {
     <div className="course-detail-page-wrapper">
       <main className="course-detail-main">
         <div className="course-detail-container">
-          {isEditing ? (
+          {isEditing && isOwner ? (
             <div className="course-detail-edit-wrapper">
               <nav className="course-detail-breadcrumb" aria-label="Breadcrumb">
                 <button
@@ -222,71 +245,71 @@ export function CourseDetailPage() {
 
                 <p className="course-detail-description">{course.description}</p>
 
-                {/* Edit & Delete Action Buttons */}
-                <div className="course-detail-actions-bar">
-                  <button
-                    type="button"
-                    className="btn-detail-edit"
-                    onClick={() => {
-                      setActionError(null);
-                      setIsEditing(true);
-                    }}
-                    aria-label="Edit Course"
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                      edit
-                    </span>
-                    <span>Edit Course</span>
-                  </button>
+                {/* Edit & Delete Action Buttons (Instructor Course Owner Only) */}
+                {isOwner && (
+                  <div className="course-detail-actions-bar">
+                    <button
+                      type="button"
+                      className="btn-detail-edit"
+                      onClick={() => {
+                        setActionError(null);
+                        setIsEditing(true);
+                      }}
+                      aria-label="Edit Course"
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                        edit
+                      </span>
+                      <span>Edit Course</span>
+                    </button>
 
-                  {isOwner && (
                     <a href="#enrolled-students-section" className="btn-detail-students">
                       <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                         group
                       </span>
                       <span>Enrolled Students</span>
                     </a>
-                  )}
 
-                  {!showDeleteConfirm ? (
-                    <button
-                      type="button"
-                      className="btn-detail-delete"
-                      onClick={() => {
-                        setActionError(null);
-                        setShowDeleteConfirm(true);
-                      }}
-                      aria-label="Delete Course"
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                        delete
-                      </span>
-                      <span>Delete Course</span>
-                    </button>
-                  ) : (
-                    <div className="detail-delete-confirm-box">
-                      <span className="delete-confirm-label">Confirm delete?</span>
+                    {!showDeleteConfirm ? (
                       <button
                         type="button"
-                        className="btn-detail-confirm-delete"
-                        onClick={handleDeleteCourse}
-                        disabled={deleteMutation.isPending}
-                        aria-label="Confirm delete this course"
+                        className="btn-detail-delete"
+                        onClick={() => {
+                          setActionError(null);
+                          setShowDeleteConfirm(true);
+                        }}
+                        aria-label="Delete Course"
                       >
-                        {deleteMutation.isPending ? 'Deleting...' : 'Yes, Delete'}
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                          delete
+                        </span>
+                        <span>Delete Course</span>
                       </button>
-                      <button
-                        type="button"
-                        className="btn-detail-cancel-delete"
-                        onClick={() => setShowDeleteConfirm(false)}
-                        disabled={deleteMutation.isPending}
-                        aria-label="Cancel deletion"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  )}
-                </div>
+                    ) : (
+                      <div className="detail-delete-confirm-box">
+                        <span className="delete-confirm-label">Confirm delete?</span>
+                        <button
+                          type="button"
+                          className="btn-detail-confirm-delete"
+                          onClick={handleDeleteCourse}
+                          disabled={deleteMutation.isPending}
+                          aria-label="Confirm delete this course"
+                        >
+                          {deleteMutation.isPending ? 'Deleting...' : 'Yes, Delete'}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-detail-cancel-delete"
+                          onClick={() => setShowDeleteConfirm(false)}
+                          disabled={deleteMutation.isPending}
+                          aria-label="Cancel deletion"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {actionError && (
                   <div className="detail-action-error-alert" role="alert">
@@ -377,6 +400,15 @@ export function CourseDetailPage() {
                         </div>
                       )}
 
+                      {unenrollError && (
+                        <div className="enroll-alert-banner error">
+                          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                            warning
+                          </span>
+                          <span>{unenrollError}</span>
+                        </div>
+                      )}
+
                       {!user ? (
                         <div className="enroll-auth-prompt">
                           <button
@@ -408,6 +440,20 @@ export function CourseDetailPage() {
                           >
                             Go to Dashboard
                           </button>
+                          <button
+                            type="button"
+                            className="btn-enroll-action unenroll"
+                            onClick={() => {
+                              setUnenrollError(null);
+                              setShowUnenrollModal(true);
+                            }}
+                            disabled={unenrollMutation.isPending}
+                          >
+                            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                              person_remove
+                            </span>
+                            <span>Unenroll</span>
+                          </button>
                         </div>
                       ) : (
                         <button
@@ -432,6 +478,14 @@ export function CourseDetailPage() {
           )}
     </div>
   </main>
+
+  <ConfirmUnenrollModal
+    isOpen={showUnenrollModal}
+    courseTitle={course?.title || 'this course'}
+    isUnenrolling={unenrollMutation.isPending}
+    onConfirm={handleUnenroll}
+    onCancel={() => setShowUnenrollModal(false)}
+  />
 
   <Footer />
 </div>

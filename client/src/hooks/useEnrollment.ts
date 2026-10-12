@@ -51,6 +51,7 @@ export function useUnenrollCourse() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enrollment-check'] });
       queryClient.invalidateQueries({ queryKey: ENROLLMENTS_KEY });
+      queryClient.invalidateQueries({ queryKey: ['courses'] });
     },
   });
 }

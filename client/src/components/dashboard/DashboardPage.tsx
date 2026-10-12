@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useCurrentUser, useLogout } from '../../hooks/useAuth.js';
 import { useCourses, useDeleteCourse } from '../../hooks/useCourses.js';
-import { useMyEnrollments } from '../../hooks/useEnrollment.js';
+import { useMyEnrollments, useUnenrollCourse } from '../../hooks/useEnrollment.js';
 import { CourseCardMenu } from '../course/CourseCardMenu.js';
 import { ConfirmDeleteModal } from '../course/ConfirmDeleteModal.js';
+import { ConfirmUnenrollModal } from '../course/ConfirmUnenrollModal.js';
 import { CourseStudentsModal } from '../course/CourseStudentsModal.js';
 import type { Course } from '../../types/course.js';
 import './DashboardPage.css';
@@ -14,11 +15,14 @@ export function DashboardPage() {
   const logoutMutation = useLogout();
   const { data: allCourses = [], isLoading: isCoursesLoading } = useCourses();
   const deleteMutation = useDeleteCourse();
+  const unenrollMutation = useUnenrollCourse();
   const navigate = useNavigate();
 
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [selectedCourseForStudents, setSelectedCourseForStudents] = useState<Course | null>(null);
+  const [enrollmentToUnenroll, setEnrollmentToUnenroll] = useState<{ id: string; title: string } | null>(null);
+  const [unenrollError, setUnenrollError] = useState<string | null>(null);
 
   const isStudent = user?.role === 'student';
   const { data: myEnrollments = [], isLoading: isEnrollmentsLoading } = useMyEnrollments(Boolean(isStudent));
@@ -32,6 +36,19 @@ export function DashboardPage() {
       onError: (err: any) => {
         setDeleteError(err?.message || 'Failed to delete course');
         setCourseToDelete(null);
+      },
+    });
+  };
+
+  const handleUnenrollCourse = (enrollmentId: string) => {
+    setUnenrollError(null);
+    unenrollMutation.mutate(enrollmentId, {
+      onSuccess: () => {
+        setEnrollmentToUnenroll(null);
+      },
+      onError: (err: any) => {
+        setUnenrollError(err?.message || 'Failed to unenroll from course');
+        setEnrollmentToUnenroll(null);
       },
     });
   };
@@ -231,6 +248,15 @@ export function DashboardPage() {
               </button>
             </div>
 
+            {unenrollError && (
+              <div className="dashboard-delete-error" role="alert" style={{ marginBottom: '1.25rem' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                  error
+                </span>
+                <span>{unenrollError}</span>
+              </div>
+            )}
+
             {isEnrollmentsLoading ? (
               <div className="dashboard-loading-box">
                 <p>Loading your enrolled courses...</p>
@@ -307,15 +333,30 @@ export function DashboardPage() {
                           </span>
                         </span>
 
-                        <Link
-                          to={`/courses/${courseId}`}
-                          className="btn-card-view-link"
-                        >
-                          <span>Open Content</span>
-                          <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>
-                            arrow_forward
-                          </span>
-                        </Link>
+                        <div className="dashboard-card-actions">
+                          <Link
+                            to={`/courses/${courseId}`}
+                            className="btn-card-view-link"
+                          >
+                            <span>Open Content</span>
+                            <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>
+                              arrow_forward
+                            </span>
+                          </Link>
+
+                          <button
+                            type="button"
+                            className="btn-dash-unenroll"
+                            onClick={() => setEnrollmentToUnenroll({ id: enrollment._id, title: courseTitle })}
+                            title="Unenroll from this course"
+                            aria-label={`Unenroll from ${courseTitle}`}
+                          >
+                            <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>
+                              person_remove
+                            </span>
+                            <span>Unenroll</span>
+                          </button>
+                        </div>
                       </div>
                     </article>
                   );
@@ -340,6 +381,16 @@ export function DashboardPage() {
           isDeleting={deleteMutation.isPending}
           onConfirm={() => handleDeleteCourse(courseToDelete._id)}
           onCancel={() => setCourseToDelete(null)}
+        />
+      )}
+
+      {enrollmentToUnenroll && (
+        <ConfirmUnenrollModal
+          isOpen={Boolean(enrollmentToUnenroll)}
+          courseTitle={enrollmentToUnenroll.title}
+          isUnenrolling={unenrollMutation.isPending}
+          onConfirm={() => handleUnenrollCourse(enrollmentToUnenroll.id)}
+          onCancel={() => setEnrollmentToUnenroll(null)}
         />
       )}
     </div>

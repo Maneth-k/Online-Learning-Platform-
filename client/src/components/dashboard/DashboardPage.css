@@ -360,6 +360,31 @@
   border-color: #fda4af;
 }
 
+.btn-dash-unenroll {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #c2410c;
+  padding: 0.45rem 0.65rem;
+  min-height: 38px;
+  box-sizing: border-box;
+  border-radius: var(--radius-sm, 6px);
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+}
+
+.btn-dash-unenroll:hover {
+  background: #ffedd5;
+  color: #9a3412;
+  border-color: #fdba74;
+}
+
 .dash-delete-confirm-box {
   display: inline-flex;
   align-items: center;

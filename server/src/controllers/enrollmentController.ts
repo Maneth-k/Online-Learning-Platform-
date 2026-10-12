@@ -424,7 +424,14 @@ export const unenroll = async (
       return;
     }
 
-    const enrollment = await Enrollment.findById(id);
+    let enrollment = await Enrollment.findById(id);
+    if (!enrollment) {
+      enrollment = await Enrollment.findOne({
+        course: new Types.ObjectId(id),
+        student: new Types.ObjectId(req.user!.userId),
+      });
+    }
+
     if (!enrollment) {
       res.status(404).json({
         success: false,
@@ -451,7 +458,7 @@ export const unenroll = async (
       return;
     }
 
-    await Enrollment.findByIdAndDelete(id);
+    await Enrollment.findByIdAndDelete(enrollment._id);
 
     res.status(200).json({
       success: true,
