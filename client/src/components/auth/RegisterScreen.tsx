@@ -32,7 +32,7 @@ export function RegisterScreen({
     }
   }, [initialRole, queryRole]);
 
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -52,9 +52,10 @@ export function RegisterScreen({
     e.preventDefault();
     setErrorMsg(null);
 
-    const cleanUsername = username.trim();
-    if (!cleanUsername || cleanUsername.length < 3) {
-      setErrorMsg('Username must be at least 3 characters long');
+    const cleanEmail = email.trim().toLowerCase();
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!cleanEmail || !emailRegex.test(cleanEmail)) {
+      setErrorMsg('Please enter a valid email address');
       return;
     }
 
@@ -65,7 +66,7 @@ export function RegisterScreen({
 
     registerMutation.mutate(
       {
-        username: cleanUsername,
+        email: cleanEmail,
         password,
         role: selectedRole,
       },
@@ -73,8 +74,8 @@ export function RegisterScreen({
         onSuccess: (user) => {
           setSuccessToast(
             selectedRole === 'instructor'
-              ? `Welcome Professor ${user.username}! Your instructor studio is ready.`
-              : `Welcome Scholar ${user.username}! Your learning track is activated.`
+              ? `Welcome Professor ${user.email}! Your instructor studio is ready.`
+              : `Welcome ${user.email}! Your learning track is activated.`
           );
           setTimeout(() => {
             if (onSuccess) {
@@ -190,30 +191,27 @@ export function RegisterScreen({
 
               {/* Registration Form */}
               <form className="auth-credentials-form" onSubmit={handleSubmit} noValidate>
-                {/* Username */}
+                {/* Email */}
                 <div className="form-field-group">
-                  <label className="form-label" htmlFor="reg-username">
-                    {selectedRole === 'instructor' ? 'Faculty Username' : 'Scholar Username'}
+                  <label className="form-label" htmlFor="reg-email">
+                    Email address
                   </label>
                   <div className="form-input-container">
                     <span
                       className="material-symbols-outlined input-leading-icon"
                       style={{ fontSize: '18px' }}
                     >
-                      {selectedRole === 'instructor' ? 'badge' : 'person'}
+                      alternate_email
                     </span>
                     <input
-                      id="reg-username"
-                      type="text"
+                      id="reg-email"
+                      type="email"
                       required
-                      placeholder={
-                        selectedRole === 'instructor' ? 'e.g. prof_johnson' : 'e.g. eleanor_vance'
-                      }
+                      placeholder="name@example.com"
                       className="form-input-control"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      minLength={3}
-                      autoComplete="username"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="email"
                     />
                   </div>
                 </div>

@@ -7,6 +7,7 @@ export interface InstructorCourseSummary {
 
 export interface Instructor {
   _id: string;
+  email?: string;
   username: string;
   name: string;
   role: 'instructor';

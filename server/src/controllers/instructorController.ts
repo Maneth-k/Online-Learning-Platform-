@@ -28,6 +28,7 @@ export interface InstructorCourseSummary {
 
 export interface InstructorItem {
   _id: string;
+  email?: string;
   username: string;
   role: 'instructor';
   createdAt?: Date;
@@ -94,6 +95,7 @@ export const getInstructors = async (
 
       userConditions.push({
         $or: [
+          { email: { $regex: pattern, $options: 'i' } },
           { username: { $regex: pattern, $options: 'i' } },
           { _id: { $in: matchingCourseInstructorIds } },
         ],
@@ -171,7 +173,8 @@ export const getInstructors = async (
 
       return {
         _id: instId,
-        username: inst.username,
+        email: inst.email || (inst as any).username,
+        username: (inst as any).username || inst.email,
         role: 'instructor' as const,
         createdAt: inst.createdAt,
         coursesCount: instCourses.length,
@@ -258,7 +261,8 @@ export const getInstructorById = async (
 
     const item: InstructorItem = {
       _id: instructor._id.toString(),
-      username: instructor.username,
+      email: instructor.email || (instructor as any).username,
+      username: (instructor as any).username || instructor.email,
       role: 'instructor',
       createdAt: instructor.createdAt,
       coursesCount: courses.length,

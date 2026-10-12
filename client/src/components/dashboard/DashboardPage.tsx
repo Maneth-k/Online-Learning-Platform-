@@ -66,7 +66,7 @@ export function DashboardPage() {
         <div className="dashboard-header-row">
           <div>
             <h1 className="dashboard-welcome-title">
-              Welcome, {user.username}!
+              Welcome, {user.email || user.username}!
             </h1>
             <p className="dashboard-role-badge">
               Role: <strong className="role-highlight">{user.role}</strong>

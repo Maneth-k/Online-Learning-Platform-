@@ -14,16 +14,21 @@ import type { ActionResult } from '../types/actionResult.js';
  */
 export const register = async (req: Request, res: Response<ActionResult>): Promise<void> => {
   try {
-    const { username, password, role } = req.body;
+    const rawEmail = req.body.email || req.body.username;
+    const { password, role } = req.body;
 
     // Basic input validations
-    if (!username || typeof username !== 'string' || username.trim().length < 3) {
+    if (!rawEmail || typeof rawEmail !== 'string' || rawEmail.trim().length < 3) {
       res.status(400).json({
         success: false,
-        message: 'Username is required and must be at least 3 characters long',
+        message: req.body.email
+          ? 'Email is required and must be valid'
+          : 'Username is required and must be at least 3 characters long',
       });
       return;
     }
+
+    const email = rawEmail.trim().toLowerCase();
 
     if (!password || typeof password !== 'string' || password.length < 6) {
       res.status(400).json({
@@ -35,19 +40,22 @@ export const register = async (req: Request, res: Response<ActionResult>): Promi
 
     const assignedRole: UserRole = role === 'instructor' ? 'instructor' : 'student';
 
-    // Check for existing username
-    const existingUser = await User.findOne({ username: username.trim() });
+    // Check for existing user by email or username
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username: email }],
+    });
     if (existingUser) {
       res.status(409).json({
         success: false,
-        message: 'Username is already taken',
+        message: req.body.email ? 'Email is already registered' : 'Username is already taken',
       });
       return;
     }
 
     // Create new user (password is automatically hashed by pre-save hook)
     const newUser = await User.create({
-      username: username.trim(),
+      email,
+      username: req.body.username?.trim() || email.split('@')[0],
       password,
       role: assignedRole,
     });
@@ -67,7 +75,8 @@ export const register = async (req: Request, res: Response<ActionResult>): Promi
       data: {
         user: {
           id: newUser._id,
-          username: newUser.username,
+          email: newUser.email,
+          username: newUser.username || newUser.email,
           role: newUser.role,
           createdAt: newUser.createdAt,
         },
@@ -89,22 +98,29 @@ export const register = async (req: Request, res: Response<ActionResult>): Promi
  */
 export const login = async (req: Request, res: Response<ActionResult>): Promise<void> => {
   try {
-    const { username, password } = req.body;
+    const rawEmail = req.body.email || req.body.username;
+    const { password } = req.body;
 
-    if (!username || !password) {
+    if (!rawEmail || !password) {
       res.status(400).json({
         success: false,
-        message: 'Username and password are required',
+        message: req.body.email
+          ? 'Email and password are required'
+          : 'Username and password are required',
       });
       return;
     }
 
-    // Find user by username
-    const user = await User.findOne({ username: username.trim() });
+    const identifier = rawEmail.trim().toLowerCase();
+
+    // Find user by email or username
+    const user = await User.findOne({
+      $or: [{ email: identifier }, { username: identifier }],
+    });
     if (!user) {
       res.status(401).json({
         success: false,
-        message: 'Invalid username or password',
+        message: req.body.email ? 'Invalid email or password' : 'Invalid username or password',
       });
       return;
     }
@@ -114,7 +130,7 @@ export const login = async (req: Request, res: Response<ActionResult>): Promise<
     if (!isPasswordValid) {
       res.status(401).json({
         success: false,
-        message: 'Invalid username or password',
+        message: req.body.email ? 'Invalid email or password' : 'Invalid username or password',
       });
       return;
     }
@@ -134,7 +150,8 @@ export const login = async (req: Request, res: Response<ActionResult>): Promise<
       data: {
         user: {
           id: user._id,
-          username: user.username,
+          email: user.email || (user as any).username,
+          username: user.username || user.email,
           role: user.role,
           createdAt: user.createdAt,
         },
@@ -198,7 +215,8 @@ export const getMe = async (req: Request, res: Response<ActionResult>): Promise<
       data: {
         user: {
           id: user._id,
-          username: user.username,
+          email: user.email || (user as any).username,
+          username: user.username || user.email,
           role: user.role,
           createdAt: user.createdAt,
         },

@@ -6,6 +6,7 @@ import User from '../models/User.js';
 import Course from '../models/Course.js';
 
 interface SeedInstructor {
+  email: string;
   username: string;
   courses: {
     title: string;
@@ -17,6 +18,7 @@ interface SeedInstructor {
 
 const SEED_INSTRUCTORS: SeedInstructor[] = [
   {
+    email: 'soren.vance@mentora.edu',
     username: 'dr_soren_vance',
     courses: [
       {
@@ -42,6 +44,7 @@ Module 2: Full-Stack React 19 & Node Ecosystem
     ],
   },
   {
+    email: 'elena.rostova@mentora.edu',
     username: 'elena_rostova',
     courses: [
       {
@@ -59,6 +62,7 @@ Module 2: Metric Architecture & Retention Dynamics
     ],
   },
   {
+    email: 'aris.thorne@mentora.edu',
     username: 'prof_aris_thorne',
     courses: [
       {
@@ -76,6 +80,7 @@ Module 2: Transformer Architectures & Attention
     ],
   },
   {
+    email: 'kavita.sharma@mentora.edu',
     username: 'kavita_sharma',
     courses: [
       {
@@ -93,6 +98,7 @@ Module 2: Observability & Chaos Engineering
     ],
   },
   {
+    email: 'instructor1@mentora.edu',
     username: 'instructor1',
     courses: [
       {
@@ -122,21 +128,27 @@ async function seed(): Promise<void> {
     let createdCourseCount = 0;
 
     for (const instData of SEED_INSTRUCTORS) {
-      let instructor = await User.findOne({ username: instData.username });
+      let instructor = await User.findOne({
+        $or: [{ email: instData.email }, { username: instData.username }],
+      });
 
       if (!instructor) {
         instructor = await User.create({
+          email: instData.email,
           username: instData.username,
           password: defaultPassword,
           role: 'instructor',
         });
-        console.log(`[Created] Instructor: "${instData.username}"`);
+        console.log(`[Created] Instructor: "${instData.email}" (${instData.username})`);
         createdInstructorCount++;
       } else {
+        if (!instructor.email) {
+          instructor.email = instData.email;
+        }
         if (instructor.role !== 'instructor') {
           instructor.role = 'instructor';
-          await instructor.save();
         }
+        await instructor.save();
       }
 
       for (const courseData of instData.courses) {

@@ -191,7 +191,7 @@ export const getCourses = async (
 
     const [courses, totalCourses] = await Promise.all([
       Course.find(where)
-        .populate('instructor', 'username')
+        .populate('instructor', 'email username')
         .sort({ createdAt: -1 })
         .skip(offset)
         .limit(limit),
@@ -245,7 +245,7 @@ export const getCourseById = async (
       return;
     }
 
-    const course = await Course.findById(id).populate('instructor', 'username');
+    const course = await Course.findById(id).populate('instructor', 'email username');
 
     if (!course) {
       res.status(404).json({

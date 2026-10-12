@@ -157,7 +157,7 @@ export function InstructorsPage({
             {instructors.map((instructor: Instructor) => (
               <article key={instructor._id} className="instructor-card">
                 <div className="instructor-card-header">
-                  <h2 className="instructor-name">{instructor.name || instructor.username}</h2>
+                  <h2 className="instructor-name">{instructor.name || instructor.email || instructor.username}</h2>
                   <span className="instructor-course-count">
                     {instructor.courses.length} {instructor.courses.length === 1 ? 'course' : 'courses'}
                   </span>
