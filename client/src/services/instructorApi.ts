@@ -17,14 +17,14 @@ function formatUsernameToName(username: string): string {
  */
 function formatInstructor(raw: any): Instructor {
   const email = raw.email || '';
-  const username = raw.username || raw.email || '';
+  const username = raw.username || email;
   let displayName = raw.name;
   if (!displayName) {
-    if (raw.email) {
-      const emailPrefix = raw.email.split('@')[0];
+    if (email) {
+      const emailPrefix = email.split('@')[0];
       displayName = formatUsernameToName(emailPrefix);
-    } else if (raw.username) {
-      displayName = formatUsernameToName(raw.username);
+    } else if (username) {
+      displayName = formatUsernameToName(username);
     } else {
       displayName = 'Instructor';
     }
