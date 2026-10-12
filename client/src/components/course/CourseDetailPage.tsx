@@ -1,21 +1,52 @@
-import { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useCourse } from '../../hooks/useCourses.js';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useCourse, useDeleteCourse } from '../../hooks/useCourses.js';
 import { useCurrentUser } from '../../hooks/useAuth.js';
 import { useCheckEnrollment, useEnrollCourse } from '../../hooks/useEnrollment.js';
+import { AddCourseForm } from '../AddCourseForm.js';
+import { CourseStudentsSection } from './CourseStudentsSection.js';
 import { Footer } from '../landing/Footer.js';
 import type { Course } from '../../types/course.js';
 import './CourseDetailPage.css';
 
 export function CourseDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const { data: user } = useCurrentUser();
   const { data: course, isLoading, isError, error } = useCourse(id);
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const deleteMutation = useDeleteCourse();
   const isStudent = user?.role === 'student';
   const isInstructor = user?.role === 'instructor';
+
+  const userId = user?.id || (user as any)?._id;
+  const courseInstructorId =
+    typeof course?.instructor === 'object' && course?.instructor !== null
+      ? course.instructor._id || (course.instructor as any).id
+      : typeof course?.instructor === 'string'
+      ? course.instructor
+      : undefined;
+
+  const isOwner = Boolean(
+    isInstructor &&
+    user &&
+    course &&
+    userId &&
+    courseInstructorId &&
+    String(userId) === String(courseInstructorId)
+  );
+
+  useEffect(() => {
+    if (searchParams.get('edit') === 'true' && isOwner) {
+      setIsEditing(true);
+    }
+  }, [searchParams, isOwner]);
 
   const {
     data: enrollmentCheck,
@@ -46,6 +77,25 @@ export function CourseDetailPage() {
     });
   };
 
+  const handleDeleteCourse = () => {
+    if (!id) return;
+    setActionError(null);
+
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        navigate(isInstructor ? '/dashboard' : '/courses');
+      },
+      onError: (err: any) => {
+        const msg =
+          err?.message?.includes('403') || err?.message?.toLowerCase().includes('permission')
+            ? 'Only the instructor who created this course can delete it.'
+            : err?.message || 'Failed to delete course';
+        setActionError(msg);
+        setShowDeleteConfirm(false);
+      },
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="course-detail-page-wrapper">
@@ -72,11 +122,14 @@ export function CourseDetailPage() {
               ? error.message
               : 'The requested course does not exist or may have been removed.'}
           </p>
-          <Link to="/courses" className="btn-back-to-courses">
+          <Link
+            to={isInstructor ? '/dashboard' : '/courses'}
+            className="btn-back-to-courses"
+          >
             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
               arrow_back
             </span>
-            <span>Back to Courses</span>
+            <span>{isInstructor ? 'Back to Dashboard' : 'Back to Courses'}</span>
           </Link>
         </div>
       </div>
@@ -87,56 +140,163 @@ export function CourseDetailPage() {
     <div className="course-detail-page-wrapper">
       <main className="course-detail-main">
         <div className="course-detail-container">
-          {/* Breadcrumb Navigation */}
-          <nav className="course-detail-breadcrumb" aria-label="Breadcrumb">
-            <Link to="/courses" className="breadcrumb-nav-link">
-              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
-                arrow_back
-              </span>
-              <span>All Courses</span>
-            </Link>
-            <span className="breadcrumb-separator">/</span>
-            <span className="breadcrumb-current-title">{course.title}</span>
-          </nav>
-
-          {/* Hero Header */}
-          <header className="course-detail-header-card">
-            <div className="course-header-meta-row">
-              <span className="course-detail-category-tag">
-                {course.category || 'General'}
-              </span>
-              {course.createdAt && (
-                <span className="course-detail-date">
-                  <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>
-                    calendar_today
+          {isEditing ? (
+            <div className="course-detail-edit-wrapper">
+              <nav className="course-detail-breadcrumb" aria-label="Breadcrumb">
+                <button
+                  type="button"
+                  className="breadcrumb-back-button"
+                  onClick={() => setIsEditing(false)}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                    arrow_back
                   </span>
-                  <span>
-                    {new Date(course.createdAt).toLocaleDateString(undefined, {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
+                  <span>Back to Course View</span>
+                </button>
+                <span className="breadcrumb-separator">/</span>
+                <span className="breadcrumb-current-title">Editing: {course.title}</span>
+              </nav>
+
+              <AddCourseForm
+                course={course}
+                onSuccess={() => {
+                  setIsEditing(false);
+                }}
+                onCancel={() => {
+                  setIsEditing(false);
+                }}
+              />
+            </div>
+          ) : (
+            <>
+              {/* Breadcrumb Navigation */}
+              <nav className="course-detail-breadcrumb" aria-label="Breadcrumb">
+                <Link
+                  to={isInstructor ? '/dashboard' : '/courses'}
+                  className="breadcrumb-nav-link"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                    arrow_back
                   </span>
-                </span>
-              )}
-            </div>
+                  <span>{isInstructor ? 'Instructor Dashboard' : 'All Courses'}</span>
+                </Link>
+                <span className="breadcrumb-separator">/</span>
+                <span className="breadcrumb-current-title">{course.title}</span>
+              </nav>
 
-            <h1 className="course-detail-title">{course.title}</h1>
+              {/* Hero Header */}
+              <header className="course-detail-header-card">
+                <div className="course-header-meta-row">
+                  <span className="course-detail-category-tag">
+                    {course.category || 'General'}
+                  </span>
+                  {course.createdAt && (
+                    <span className="course-detail-date">
+                      <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>
+                        calendar_today
+                      </span>
+                      <span>
+                        {new Date(course.createdAt).toLocaleDateString(undefined, {
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    </span>
+                  )}
+                </div>
 
-            <div className="course-detail-instructor-row">
-              <div className="instructor-mini-avatar">
-                {getInstructorName(course.instructor).charAt(0).toUpperCase()}
-              </div>
-              <div className="instructor-meta-text">
-                <span className="instructor-label">Instructor</span>
-                <span className="instructor-full-name">
-                  {getInstructorName(course.instructor)}
-                </span>
-              </div>
-            </div>
+                <h1 className="course-detail-title">{course.title}</h1>
 
-            <p className="course-detail-description">{course.description}</p>
-          </header>
+                <div className="course-detail-instructor-row">
+                  <div className="instructor-mini-avatar">
+                    {getInstructorName(course.instructor).charAt(0).toUpperCase()}
+                  </div>
+                  <div className="instructor-meta-text">
+                    <span className="instructor-label">Instructor</span>
+                    <span className="instructor-full-name">
+                      {getInstructorName(course.instructor)}
+                    </span>
+                  </div>
+                </div>
+
+                <p className="course-detail-description">{course.description}</p>
+
+                {/* Edit & Delete Action Buttons */}
+                <div className="course-detail-actions-bar">
+                  <button
+                    type="button"
+                    className="btn-detail-edit"
+                    onClick={() => {
+                      setActionError(null);
+                      setIsEditing(true);
+                    }}
+                    aria-label="Edit Course"
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                      edit
+                    </span>
+                    <span>Edit Course</span>
+                  </button>
+
+                  {isOwner && (
+                    <a href="#enrolled-students-section" className="btn-detail-students">
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                        group
+                      </span>
+                      <span>Enrolled Students</span>
+                    </a>
+                  )}
+
+                  {!showDeleteConfirm ? (
+                    <button
+                      type="button"
+                      className="btn-detail-delete"
+                      onClick={() => {
+                        setActionError(null);
+                        setShowDeleteConfirm(true);
+                      }}
+                      aria-label="Delete Course"
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                        delete
+                      </span>
+                      <span>Delete Course</span>
+                    </button>
+                  ) : (
+                    <div className="detail-delete-confirm-box">
+                      <span className="delete-confirm-label">Confirm delete?</span>
+                      <button
+                        type="button"
+                        className="btn-detail-confirm-delete"
+                        onClick={handleDeleteCourse}
+                        disabled={deleteMutation.isPending}
+                        aria-label="Confirm delete this course"
+                      >
+                        {deleteMutation.isPending ? 'Deleting...' : 'Yes, Delete'}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-detail-cancel-delete"
+                        onClick={() => setShowDeleteConfirm(false)}
+                        disabled={deleteMutation.isPending}
+                        aria-label="Cancel deletion"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {actionError && (
+                  <div className="detail-action-error-alert" role="alert">
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                      error
+                    </span>
+                    <span>{actionError}</span>
+                  </div>
+                )}
+              </header>
 
           {/* Course Content Body */}
           <section className="course-detail-content-section">
@@ -160,119 +320,121 @@ export function CourseDetailPage() {
             </div>
           </section>
 
-          {/* Enrollment Action Box (At the end of content) */}
-          <section className="course-enrollment-action-section">
-            <div className="enrollment-action-card">
-              <div className="enrollment-action-info">
-                <div className="enrollment-badge-icon-wrap">
-                  <span className="material-symbols-outlined">
-                    {isEnrolled ? 'check_circle' : 'school'}
-                  </span>
+              {/* Enrolled Students Roster (Course Instructor Owner Only) */}
+              {isOwner && (
+                <div id="enrolled-students-section">
+                  <CourseStudentsSection courseId={course._id} courseTitle={course.title} />
                 </div>
-                <div>
-                  <h3 className="enrollment-action-title">
-                    {isEnrolled
-                      ? 'You are enrolled in this course'
-                      : 'Enrollment'}
-                  </h3>
-                  <p className="enrollment-action-subtitle">
-                    {isEnrolled
-                      ? existingEnrollment?.enrollmentDate
-                        ? `Active scholar status since ${new Date(existingEnrollment.enrollmentDate).toLocaleDateString()}`
-                        : 'You have full access to study this course material.'
-                      : 'Enroll now to add this course to your curriculum track.'}
-                  </p>
-                </div>
-              </div>
+              )}
 
-              {/* Action Buttons & Status */}
-              <div className="enrollment-action-controls">
-                {enrollSuccessMessage && (
-                  <div className="enroll-alert-banner success">
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                      verified
-                    </span>
-                    <span>{enrollSuccessMessage}</span>
-                  </div>
-                )}
+              {/* Enrollment Action Box (At the end of content for students & visitors) */}
+              {!isInstructor && (
+                <section className="course-enrollment-action-section">
+                  <div className="enrollment-action-card">
+                    <div className="enrollment-action-info">
+                      <div className="enrollment-badge-icon-wrap">
+                        <span className="material-symbols-outlined">
+                          {isEnrolled ? 'check_circle' : 'school'}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="enrollment-action-title">
+                          {isEnrolled
+                            ? 'You are enrolled in this course'
+                            : 'Enrollment'}
+                        </h3>
+                        <p className="enrollment-action-subtitle">
+                          {isEnrolled
+                            ? existingEnrollment?.enrollmentDate
+                              ? `Active student status since ${new Date(existingEnrollment.enrollmentDate).toLocaleDateString()}`
+                              : 'You have full access to study this course material.'
+                            : 'Enroll now to add this course to your curriculum track.'}
+                        </p>
+                      </div>
+                    </div>
 
-                {enrollMutation.isError && (
-                  <div className="enroll-alert-banner error">
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                      warning
-                    </span>
-                    <span>
-                      {enrollMutation.error instanceof Error
-                        ? enrollMutation.error.message
-                        : 'Failed to enroll in course'}
-                    </span>
-                  </div>
-                )}
+                    {/* Action Buttons & Status */}
+                    <div className="enrollment-action-controls">
+                      {enrollSuccessMessage && (
+                        <div className="enroll-alert-banner success">
+                          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                            verified
+                          </span>
+                          <span>{enrollSuccessMessage}</span>
+                        </div>
+                      )}
 
-                {!user ? (
-                  <div className="enroll-auth-prompt">
-                    <button
-                      type="button"
-                      className="btn-enroll-action primary"
-                      onClick={() => navigate('/login')}
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                        login
-                      </span>
-                      <span>Sign In to Enroll</span>
-                    </button>
-                    <span className="enroll-auth-hint">
-                      Requires a free student account.
-                    </span>
-                  </div>
-                ) : isInstructor ? (
-                  <div className="enroll-instructor-notice">
-                    <span className="instructor-notice-pill">
-                      <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
-                        info
-                      </span>
-                      <span>Instructors cannot enroll in courses</span>
-                    </span>
-                  </div>
-                ) : isEnrolled ? (
-                  <div className="enrolled-status-group">
-                    <span className="enrolled-check-badge">
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                        check
-                      </span>
-                      <span>Enrolled</span>
-                    </span>
-                    <button
-                      type="button"
-                      className="btn-enroll-action secondary"
-                      onClick={() => navigate('/dashboard')}
-                    >
-                      Go to Dashboard
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn-enroll-action primary"
-                    onClick={handleEnroll}
-                    disabled={enrollMutation.isPending || isCheckingEnrollment}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
-                      how_to_reg
-                    </span>
-                    <span>
-                      {enrollMutation.isPending ? 'Enrolling...' : 'Enroll in Course'}
-                    </span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </section>
-        </div>
-      </main>
+                      {enrollMutation.isError && (
+                        <div className="enroll-alert-banner error">
+                          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                            warning
+                          </span>
+                          <span>
+                            {enrollMutation.error instanceof Error
+                              ? enrollMutation.error.message
+                              : 'Failed to enroll in course'}
+                          </span>
+                        </div>
+                      )}
 
-      <Footer />
+                      {!user ? (
+                        <div className="enroll-auth-prompt">
+                          <button
+                            type="button"
+                            className="btn-enroll-action primary"
+                            onClick={() => navigate('/login')}
+                          >
+                            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                              login
+                            </span>
+                            <span>Sign In to Enroll</span>
+                          </button>
+                          <span className="enroll-auth-hint">
+                            Requires a free student account.
+                          </span>
+                        </div>
+                      ) : isEnrolled ? (
+                        <div className="enrolled-status-group">
+                          <span className="enrolled-check-badge">
+                            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                              check
+                            </span>
+                            <span>Enrolled</span>
+                          </span>
+                          <button
+                            type="button"
+                            className="btn-enroll-action secondary"
+                            onClick={() => navigate('/dashboard')}
+                          >
+                            Go to Dashboard
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn-enroll-action primary"
+                          onClick={handleEnroll}
+                          disabled={enrollMutation.isPending || isCheckingEnrollment}
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+                            how_to_reg
+                          </span>
+                          <span>
+                            {enrollMutation.isPending ? 'Enrolling...' : 'Enroll in Course'}
+                          </span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </section>
+              )}
+            </>
+          )}
     </div>
+  </main>
+
+  <Footer />
+</div>
   );
 }
 

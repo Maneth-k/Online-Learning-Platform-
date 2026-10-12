@@ -4,8 +4,15 @@ import {
   checkCourseEnrollment,
   fetchMyEnrollments,
   unenrollCourse,
+  fetchCourseStudents,
+  updateEnrollmentStatusApi,
 } from '../services/enrollmentApi.js';
-import type { Enrollment, CheckEnrollmentResponse } from '../types/enrollment.js';
+import type {
+  Enrollment,
+  CheckEnrollmentResponse,
+  CourseStudentsResponse,
+  EnrollmentStatus,
+} from '../types/enrollment.js';
 
 export const ENROLLMENTS_KEY = ['my-enrollments'] as const;
 
@@ -43,6 +50,30 @@ export function useUnenrollCourse() {
     mutationFn: (enrollmentId: string) => unenrollCourse(enrollmentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enrollment-check'] });
+      queryClient.invalidateQueries({ queryKey: ENROLLMENTS_KEY });
+    },
+  });
+}
+
+export function useCourseStudents(
+  courseId: string | undefined,
+  options?: { page?: number; limit?: number; status?: string },
+  enabled: boolean = true
+) {
+  return useQuery<CourseStudentsResponse>({
+    queryKey: ['course-students', courseId, options] as const,
+    queryFn: () => fetchCourseStudents(courseId!, options),
+    enabled: Boolean(courseId && enabled),
+  });
+}
+
+export function useUpdateEnrollmentStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ enrollmentId, status }: { enrollmentId: string; status: EnrollmentStatus }) =>
+      updateEnrollmentStatusApi(enrollmentId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['course-students'] });
       queryClient.invalidateQueries({ queryKey: ENROLLMENTS_KEY });
     },
   });

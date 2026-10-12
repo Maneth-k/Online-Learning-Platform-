@@ -1,17 +1,40 @@
+import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useCurrentUser, useLogout } from '../../hooks/useAuth.js';
-import { useCourses } from '../../hooks/useCourses.js';
+import { useCourses, useDeleteCourse } from '../../hooks/useCourses.js';
 import { useMyEnrollments } from '../../hooks/useEnrollment.js';
+import { CourseCardMenu } from '../course/CourseCardMenu.js';
+import { ConfirmDeleteModal } from '../course/ConfirmDeleteModal.js';
+import { CourseStudentsModal } from '../course/CourseStudentsModal.js';
+import type { Course } from '../../types/course.js';
 import './DashboardPage.css';
 
 export function DashboardPage() {
   const { data: user, isLoading: isAuthLoading } = useCurrentUser();
   const logoutMutation = useLogout();
   const { data: allCourses = [], isLoading: isCoursesLoading } = useCourses();
+  const deleteMutation = useDeleteCourse();
   const navigate = useNavigate();
+
+  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [selectedCourseForStudents, setSelectedCourseForStudents] = useState<Course | null>(null);
 
   const isStudent = user?.role === 'student';
   const { data: myEnrollments = [], isLoading: isEnrollmentsLoading } = useMyEnrollments(Boolean(isStudent));
+
+  const handleDeleteCourse = (courseId: string) => {
+    setDeleteError(null);
+    deleteMutation.mutate(courseId, {
+      onSuccess: () => {
+        setCourseToDelete(null);
+      },
+      onError: (err: any) => {
+        setDeleteError(err?.message || 'Failed to delete course');
+        setCourseToDelete(null);
+      },
+    });
+  };
 
   if (isAuthLoading) {
     return (
@@ -28,14 +51,13 @@ export function DashboardPage() {
     return <Navigate to="/login" replace />;
   }
 
+  const userId = user.id || (user as any)._id;
   const instructorCourses = (allCourses || []).filter((c) => {
     if (typeof c.instructor === 'object' && c.instructor !== null) {
-      return (
-        c.instructor._id === user.id ||
-        c.instructor.username?.toLowerCase() === user.username.toLowerCase()
-      );
+      const instId = c.instructor._id || (c.instructor as any).id;
+      return Boolean(userId && instId && String(instId) === String(userId));
     }
-    return c.instructor === user.id || c.instructor === user.username;
+    return typeof c.instructor === 'string' && Boolean(userId && String(c.instructor) === String(userId));
   });
 
   return (
@@ -96,7 +118,7 @@ export function DashboardPage() {
                 </div>
                 <h3 className="empty-courses-title">No courses created yet</h3>
                 <p className="empty-courses-text">
-                  Share your knowledge with scholars worldwide. Create your first course to get started.
+                  Share your knowledge with students worldwide. Create your first course to get started.
                 </p>
                 <Link to="/create-course" className="btn-create-course-link">
                   <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
@@ -106,56 +128,78 @@ export function DashboardPage() {
                 </Link>
               </div>
             ) : (
-              <div className="dashboard-courses-grid">
-                {instructorCourses.map((course) => (
-                  <article key={course._id} className="dashboard-course-card">
-                    <div>
-                      <div className="dashboard-course-top">
-                        <span className="dashboard-course-cat">
-                          {course.category || 'General'}
-                        </span>
-                        <span className="dashboard-course-status">
-                          Active
-                        </span>
+              <>
+                {deleteError && (
+                  <div className="dash-error-banner" role="alert">
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                      error
+                    </span>
+                    <span>{deleteError}</span>
+                  </div>
+                )}
+
+                <div className="dashboard-courses-grid">
+                  {instructorCourses.map((course) => (
+                    <article key={course._id} className="dashboard-course-card">
+                      <div>
+                        <div className="dashboard-course-top">
+                          <div className="dashboard-course-badges">
+                            <span className="dashboard-course-cat">
+                              {course.category || 'General'}
+                            </span>
+                            <span className="dashboard-course-status">
+                              Active
+                            </span>
+                          </div>
+
+                          <CourseCardMenu
+                            courseId={course._id}
+                            courseTitle={course.title}
+                            onViewStudents={() => setSelectedCourseForStudents(course)}
+                            editUrl={`/courses/${course._id}?edit=true`}
+                            onDelete={() => setCourseToDelete(course)}
+                          />
+                        </div>
+
+                        <h3 className="dashboard-course-title">
+                          {course.title}
+                        </h3>
+
+                        <p className="dashboard-course-desc">
+                          {course.description}
+                        </p>
                       </div>
 
-                      <h3 className="dashboard-course-title">
-                        {course.title}
-                      </h3>
+                      <div className="dashboard-course-footer">
+                        <span className="course-footer-date">
+                          <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>
+                            calendar_today
+                          </span>
+                          <span>
+                            {course.createdAt
+                              ? new Date(course.createdAt).toLocaleDateString(undefined, {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })
+                              : 'Recent'}
+                          </span>
+                        </span>
 
-                      <p className="dashboard-course-desc">
-                        {course.description}
-                      </p>
-                    </div>
-
-                    <div className="dashboard-course-footer">
-                      <span className="course-footer-date">
-                        <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>
-                          calendar_today
-                        </span>
-                        <span>
-                          {course.createdAt
-                            ? new Date(course.createdAt).toLocaleDateString(undefined, {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric',
-                              })
-                            : 'Recent'}
-                        </span>
-                      </span>
-                      <Link
-                        to={`/courses/${course._id}`}
-                        className="btn-card-view-link"
-                      >
-                        <span>View</span>
-                        <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>
-                          arrow_forward
-                        </span>
-                      </Link>
-                    </div>
-                  </article>
-                ))}
-              </div>
+                        <Link
+                          to={`/courses/${course._id}`}
+                          className="btn-card-view-link"
+                        >
+                          <span>View Syllabus</span>
+                          <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>
+                            arrow_forward
+                          </span>
+                        </Link>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </>
             )}
           </section>
         )}
@@ -281,6 +325,23 @@ export function DashboardPage() {
           </section>
         )}
       </main>
+
+      {selectedCourseForStudents && (
+        <CourseStudentsModal
+          course={selectedCourseForStudents}
+          onClose={() => setSelectedCourseForStudents(null)}
+        />
+      )}
+
+      {courseToDelete && (
+        <ConfirmDeleteModal
+          isOpen={Boolean(courseToDelete)}
+          courseTitle={courseToDelete.title}
+          isDeleting={deleteMutation.isPending}
+          onConfirm={() => handleDeleteCourse(courseToDelete._id)}
+          onCancel={() => setCourseToDelete(null)}
+        />
+      )}
     </div>
   );
 }

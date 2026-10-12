@@ -209,7 +209,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
   margin-bottom: 0.75rem;
+}
+
+.dashboard-course-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
 .dashboard-course-cat {
@@ -274,6 +282,13 @@
   color: var(--secondary, #006398);
 }
 
+.dashboard-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .btn-card-view-link {
   display: inline-flex;
   align-items: center;
@@ -282,15 +297,165 @@
   font-size: 0.8rem;
   color: var(--primary, #00236f);
   text-decoration: none;
-  padding: 0.25rem 0.5rem;
+  padding: 0.45rem 0.75rem;
+  min-height: 38px;
+  box-sizing: border-box;
   border-radius: var(--radius-sm, 6px);
   background: var(--surface-container-low, #eff4ff);
   transition: all 0.15s ease;
+  touch-action: manipulation;
 }
 
 .btn-card-view-link:hover {
   background: var(--primary, #00236f);
   color: #ffffff;
+}
+
+.btn-dash-students {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #0369a1;
+  padding: 0.45rem 0.75rem;
+  min-height: 38px;
+  box-sizing: border-box;
+  border-radius: var(--radius-sm, 6px);
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+}
+
+.btn-dash-students:hover {
+  background: #e0f2fe;
+  color: #0284c7;
+  border-color: #7dd3fc;
+}
+
+.btn-dash-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #e11d48;
+  padding: 0.45rem 0.65rem;
+  min-height: 38px;
+  box-sizing: border-box;
+  border-radius: var(--radius-sm, 6px);
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+}
+
+.btn-dash-delete:hover {
+  background: #ffe4e6;
+  color: #be123c;
+  border-color: #fda4af;
+}
+
+.dash-delete-confirm-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  min-height: 38px;
+  box-sizing: border-box;
+}
+
+.dash-confirm-text {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #9f1239;
+}
+
+.btn-dash-confirm-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.55rem;
+  min-height: 28px;
+  background: #e11d48;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  touch-action: manipulation;
+}
+
+.btn-dash-confirm-delete:hover:not(:disabled) {
+  background: #be123c;
+}
+
+.btn-dash-cancel-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.5rem;
+  min-height: 28px;
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  touch-action: manipulation;
+}
+
+.dash-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  padding: 0.65rem 1rem;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+@media (max-width: 500px) {
+  .dashboard-course-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .dashboard-card-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .btn-card-view-link,
+  .btn-dash-students,
+  .btn-dash-delete {
+    flex: 1;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .dash-delete-confirm-box {
+    width: 100%;
+    justify-content: space-between;
+    min-height: 44px;
+    padding: 0.35rem 0.75rem;
+  }
 }
 
 /* Student Section */

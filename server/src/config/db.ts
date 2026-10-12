@@ -6,7 +6,7 @@ if (typeof dns.setServers === 'function') {
   try {
     dns.setServers(['8.8.8.8', '1.1.1.1']);
   } catch (err) {
-    console.warn('⚠️  Could not configure custom DNS servers, using system defaults:', err);
+    console.warn('[DB] Could not configure custom DNS servers, using system defaults:', err);
   }
 }
 
@@ -42,15 +42,15 @@ export async function connectDB(customUri?: string): Promise<typeof mongoose> {
 
   // Event handlers for database lifecycle
   mongoose.connection.on('connected', () => {
-    console.log(`📦 MongoDB connected successfully to database: ${mongoose.connection.name}`);
+    console.log(`[DB] MongoDB connected successfully to database: ${mongoose.connection.name}`);
   });
 
   mongoose.connection.on('error', (err) => {
-    console.error('❌ MongoDB connection error:', err);
+    console.error('[DB] MongoDB connection error:', err);
   });
 
   mongoose.connection.on('disconnected', () => {
-    console.warn('⚠️  MongoDB disconnected');
+    console.warn('[DB] MongoDB disconnected');
   });
 
   try {
@@ -60,7 +60,7 @@ export async function connectDB(customUri?: string): Promise<typeof mongoose> {
     });
     return mongoose;
   } catch (error) {
-    console.error('❌ Failed to connect to MongoDB:', error);
+    console.error('[DB] Failed to connect to MongoDB:', error);
     throw error;
   }
 }
@@ -71,7 +71,7 @@ export async function connectDB(customUri?: string): Promise<typeof mongoose> {
 export async function disconnectDB(): Promise<void> {
   if (mongoose.connection.readyState !== 0) {
     await mongoose.disconnect();
-    console.log('📦 MongoDB connection closed gracefully.');
+    console.log('[DB] MongoDB connection closed gracefully.');
   }
 }
 

@@ -415,7 +415,7 @@ export function RecommendationsPage() {
                         <p className="source-banner-desc">{activeResult.summary}</p>
                       </div>
                     </div>
-                    <span className="source-tag">✨ AI Curated</span>
+                    <span className="source-tag">AI Curated</span>
                   </div>
                 )}
 
@@ -448,7 +448,7 @@ export function RecommendationsPage() {
                           <p className="source-banner-desc">{activeResult.summary}</p>
                         </div>
                       </div>
-                      <span className="source-tag">🔍 Keyword Match</span>
+                      <span className="source-tag">Keyword Match</span>
                     </div>
                   )}
 
@@ -469,7 +469,7 @@ export function RecommendationsPage() {
                           <p className="source-banner-desc">{activeResult.summary}</p>
                         </div>
                       </div>
-                      <span className="source-tag">🔍 Catalog Results</span>
+                      <span className="source-tag">Catalog Results</span>
                     </div>
                   )}
 

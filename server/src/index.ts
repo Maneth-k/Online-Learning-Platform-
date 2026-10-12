@@ -50,6 +50,22 @@ import { getCourseRecommendationsHandler } from './controllers/recommendationCon
 import { optionalAuthenticate } from './middleware/auth.js';
 app.post('/api/v1/ai/recommendations', optionalAuthenticate, getCourseRecommendationsHandler);
 
+// Root endpoint
+app.get('/', (_req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: 'Mentora LMS API Server is running',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      courses: '/api/courses',
+      auth: '/api/auth',
+      enrollments: '/api/enrollments',
+      instructors: '/api/instructors',
+    },
+  });
+});
+
 // Health check endpoint
 
 interface HealthResponse {
@@ -108,9 +124,9 @@ const startServer = async () => {
   }
 
   const server = app.listen(PORT, () => {
-    console.log(`🚀 LMS Server running on http://localhost:${PORT}`);
-    console.log(`🛡️  CORS allowed origin: ${CLIENT_URL}`);
-    console.log(`⚡ TypeScript environment initialized`);
+    console.log(`LMS Server running on http://localhost:${PORT}`);
+    console.log(`CORS allowed origin: ${CLIENT_URL}`);
+    console.log(`TypeScript environment initialized`);
   });
 
   // Graceful Process Termination

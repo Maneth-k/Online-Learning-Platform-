@@ -1,0 +1,124 @@
+/* Students Modal Styles */
+
+.students-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background-color: rgba(11, 28, 48, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.students-modal-content {
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border-radius: var(--radius-2xl, 16px);
+  border: 1px solid var(--outline-light, #e2e8f0);
+  box-shadow: 0 20px 40px rgba(0, 35, 111, 0.2);
+  padding: 1.5rem;
+  box-sizing: border-box;
+  animation: modalScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.students-modal-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.students-modal-course-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-full, 999px);
+  background-color: var(--surface-container-low, #eff4ff);
+  color: var(--primary, #00236f);
+  font-weight: 700;
+  font-size: 0.875rem;
+  max-width: 75%;
+}
+
+.modal-course-title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-close-students-modal {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  flex-shrink: 0;
+}
+
+.btn-close-students-modal:hover {
+  background-color: #f1f5f9;
+  color: #0b1c30;
+  border-color: #94a3b8;
+}
+
+/* Modal overrides inside CourseStudentsSection */
+.students-modal-content .course-students-section {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  padding: 1.25rem 0.5rem 0.5rem 0.5rem;
+  border: none;
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .students-modal-backdrop {
+    padding: 0.5rem;
+    align-items: flex-end;
+  }
+
+  .students-modal-content {
+    max-height: 94vh;
+    border-radius: 16px 16px 0 0;
+    padding: 1rem;
+  }
+
+  .students-modal-course-badge {
+    max-width: 70%;
+    font-size: 0.8rem;
+  }
+}
