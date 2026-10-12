@@ -343,20 +343,6 @@ export function RegisterScreen({
                 </div>
               </div>
             </div>
-
-            {/* Bottom Row */}
-            <div className="auth-panel-bottom-row">
-              <span>© 2026 Mentora Academy</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
-                  language
-                </span>
-                <span>English (US)</span>
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
-                  expand_more
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </main>
