@@ -5,7 +5,6 @@ import { HeroSection } from './HeroSection';
 import { MetricsStrip } from './MetricsStrip';
 import { FeaturedCourses } from './FeaturedCourses';
 import { HowItWorks } from './HowItWorks';
-import { AiDemoSection } from './AiDemoSection';
 import { Footer } from './Footer';
 import './LandingPage.css';
 
@@ -63,18 +62,9 @@ export function LandingPage({
   };
 
   const handleGetRecommendations = () => {
-    const el = document.getElementById('hero-synthesis');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-      const input = document.querySelector<HTMLInputElement>('.ai-prompt-input');
-      if (input) input.focus();
-    }
+    navigate('/recommendations');
   };
 
-  const handleExplorePedagogy = () => {
-    const el = document.getElementById('ai-pedagogy');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
 
   return (
     <div className="landing-page-root">
@@ -90,11 +80,6 @@ export function LandingPage({
         <FeaturedCourses onEnroll={handleEnrollCourse} />
 
         <HowItWorks />
-
-        <AiDemoSection
-          onStartFree={() => (currentUser ? navigate('/dashboard') : handleOpenAuth('register'))}
-          onExplorePedagogy={handleExplorePedagogy}
-        />
       </main>
 
       <Footer onOpenAuth={(mode) => handleOpenAuth(mode === 'register' ? 'register' : 'login')} />
